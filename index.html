@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100 słówek EN - Trener słownictwa</title>
+<script src="words.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #f4f5fa;
+    margin: 0;
+    padding: 0;
+    color: #222;
+  }
+  header {
+    background: linear-gradient(135deg, #2649B2, #8E7DE3);
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 4px 0 0; opacity: 0.9; font-size: 13px; }
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  .card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  .menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .menu-btn {
+    background: #2649B2;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 18px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .menu-btn:hover { background: #4A74F3; }
+  .menu-btn.secondary { background: #9D5CE6; }
+  .menu-btn.secondary:hover { background: #B55CE6; }
+  .stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  .progress-bar-bg {
+    background: #D4D9F0;
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .progress-bar-fill {
+    background: #4A74F3;
+    height: 100%;
+  }
+  button.action {
+    background: #2649B2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 4px;
+  }
+  button.action:hover { background: #4A74F3; }
+  button.ghost {
+    background: white;
+    color: #2649B2;
+    border: 2px solid #2649B2;
+  }
+  button.correct { background: #2649B2; }
+  button.wrong { background: #B55CE6; }
+  input[type=text] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  .flashcard {
+    background: #f4f5fa;
+    border: 2px solid #4A74F3;
+    border-radius: 14px;
+    padding: 40px 20px;
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 16px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .quiz-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: white;
+    border: 2px solid #D4D9F0;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .quiz-option:hover { border-color: #4A74F3; }
+  .quiz-option.correct { border-color: #2649B2; background: #D4D9F0; }
+  .quiz-option.wrong { border-color: #B55CE6; background: #f5e6fb; }
+  .word-chip {
+    display: inline-block;
+    background: white;
+    border: 2px solid #8E7DE3;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .word-chip.used { opacity: 0.3; pointer-events: none; }
+  .sentence-slot {
+    min-height: 50px;
+    border: 2px dashed #9D5CE6;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+    font-size: 15px;
+  }
+  .feedback { font-weight: bold; margin-top: 10px; }
+  .feedback.ok { color: #2649B2; }
+  .feedback.bad { color: #B55CE6; }
+  .category-tag {
+    display: inline-block;
+    background: #D4D9F0;
+    color: #2649B2;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+  .back-btn {
+    background: none;
+    border: none;
+    color: #2649B2;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    padding: 0;
+  }
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+  .lt-issue {
+    background: #f5e6fb;
+    border-left: 4px solid #B55CE6;
+    padding: 8px 10px;
+    margin-top: 8px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 Trener 100 słówek biznesowego angielskiego</h1>
+  <p>Ucz się, powtarzaj, sprawdzaj swoje postępy</p>
+</header>
+
+<div class="container" id="app"></div>
+
+<script>
+// ---------- DANE I STAN ----------
+const STORAGE_KEY = "word_trainer_progress_v1";
+const CUSTOM_WORDS_KEY = "word_trainer_custom_words_v1";
+
+function loadProgress() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  return raw ? JSON.parse(raw) : {};
+}
+function saveProgress(p) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+}
+function loadCustomWords() {
+  const raw = localStorage.getItem(CUSTOM_WORDS_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+function saveCustomWords(list) {
+  localStorage.setItem(CUSTOM_WORDS_KEY, JSON.stringify(list));
+}
+function getAllWords() {
+  return WORDS_DATA.concat(loadCustomWords());
+}
+
+let progress = loadProgress();
+
+function getWordState(id) {
+  if (!progress[id]) {
+    progress[id] = { level: 0, nextReview: 0, seen: 0, correct: 0 };
+  }
+  return progress[id];
+}
+
+const INTERVAL_DAYS = [0, 1, 3, 7, 14, 30, 90];
+
+function reviewWord(id, wasCorrect) {
+  const state = getWordState(id);
+  state.seen += 1;
+  if (wasCorrect) {
+    state.correct += 1;
+    state.level = Math.min(state.level + 1, 6);
+  } else {
+    state.level = Math.max(state.level - 2, 0);
+  }
+  const now = Date.now();
+  state.nextReview = now + INTERVAL_DAYS[state.level] * 24 * 60 * 60 * 1000;
+  progress[id] = state;
+  saveProgress(progress);
+}
+
+function dueWords() {
+  const now = Date.now();
+  return getAllWords().filter(w => {
+    const s = getWordState(w.id);
+    return s.nextReview <= now;
+  });
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function masteredCount() {
+  return getAllWords().filter(w => getWordState(w.id).level >= 4).length;
+}
+
+// ---------- RENDER ROUTER ----------
+const app = document.getElementById("app");
+
+function render(view) {
+  app.innerHTML = "";
+  view();
+}
+
+function backButton(target) {
+  const b = document.createElement("button");
+  b.className = "back-btn";
+  b.textContent = "← Powrót do menu";
+  b.onclick = () => render(renderMenu);
+  return b;
+}
+
+// ---------- MENU GŁÓWNE ----------
+function renderMenu() {
+  const total = getAllWords().length;
+  const mastered = masteredCount();
+  const due = dueWords().length;
+
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="stats">
+      <span>Opanowane: ${mastered} / ${total}</span>
+      <span>Do powtórki dziś: ${due}</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" style="width:${Math.round(mastered/total*100)}%"></div>
+    </div>
+  `;
+  app.appendChild(card);
+
+  const menuCard = document.createElement("div");
+  menuCard.className = "card";
+  menuCard.innerHTML = `<div class="menu-grid" id="menuGrid"></div>`;
+  app.appendChild(menuCard);
+
+  const grid = document.getElementById("menuGrid");
+  const items = [
+    { label: "🃏 Fiszki EN → PL", action: () => startFlashcards("en") },
+    { label: "🃏 Fiszki PL → EN", action: () => startFlashcards("pl") },
+    { label: "❓ Quiz wielokrotnego wyboru", action: () => startQuiz() },
+    { label: "✍ Uzupełnij lukę w zdaniu", action: () => startGapFill() },
+    { label: "🔤 Wpisz słowo z pamięci", action: () => startTyping() },
+    { label: "🧩 Ułóż zdanie", action: () => startSentenceBuilder() },
+    { label: "➕ Dodaj nowe słowo", action: () => renderAddWord() },
+    { label: "🛠 Sprawdź zdanie (LanguageTool)", action: () => renderGrammarCheck() },
+  ];
+  items.forEach(it => {
+    const b = document.createElement("button");
+    b.className = "menu-btn" + (it.label.startsWith("➕") || it.label.startsWith("🛠") ? " secondary" : "");
+    b.textContent = it.label;
+    b.onclick = it.action;
+    grid.appendChild(b);
+  });
+}
+
+// ---------- FISZKI ----------
+function startFlashcards(direction) {
+  let queue = shuffle(dueWords().length ? dueWords() : getAllWords());
+  let idx = 0;
+  let showingAnswer = false;
+
+  function draw() {
+    app.innerHTML = "";
+    app.appendChild(backButton());
+    if (idx >= queue.length) {
+      const done = document.createElement("div");
+      done.className = "card";
+      done.innerHTML = "<p>🎉 Skończyłeś tę sesję fiszek! Wróć do menu lub zacznij ponownie.</p>";
+      app.appendChild(done);
+      return;
+    }
+    const w = queue[idx];
+    const card = document.createElement("div");
+    card.className = "card";
+    const front = direction === "en" ? w.en : w.pl;
+    const back = direction === "en" ? w.pl : w.en;
+    card.innerHTML = `
+      <div class="category-tag">${w.cat}</div>
+      <div class="flashcard" id="flashcardText">${showingAnswer ? back : front}</div>
+      <p style="font-size:13px;color:#666;">${showingAnswer ? (direction === "en" ? w.sentence_en : w.sentence_pl) : ""}</p>
+    `;
+    app.appendChild(card);
+
+    if (!showingAnswer) {
+      const btn = document.createElement("button");
+      btn.className = "action";
+      btn.textContent = "Pokaż odpowiedź";
+      btn.onclick = () => { showingAnswer = true; draw(); };
+      app.appendChild(btn);
+    } else {
+      const btnGood = document.createElement("button");
+      btnGood.className = "action correct";
+      btnGood.textContent = "✅ Wiedziałem";
+      btnGood.onclick = () => { reviewWord(w.id, true); showingAnswer = false; idx++; draw(); };
+
+      const btnBad = document.createElement("button");
+      btnBad.className = "action wrong";
+      btnBad.textContent = "❌ Nie wiedziałem";
+      btnBad.onclick = () => { reviewWord(w.id, false); showingAnswer = false; idx++; draw(); };
+
+      app.appendChild(btnGood);
+      app.appendChild(btnBad);
+    }
+  }
+  draw();
+}
+
+// ---------- QUIZ ----------
+function startQuiz() {
+  let queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
+  let idx = 0;
+  let answered = false;
+
+  function draw() {
+    app.innerHTML = "";
+    app.appendChild(backButton());
+    if (idx >= queue.length) {
+      const done = document.createElement("div");
+      done.className = "card";
+      done.innerHTML = "<p>🎉 Koniec quizu! Wróć do menu, aby zagrać ponownie.</p>";
+      app.appendChild(done);
+      return;
+    }
+    const w = queue[idx];
+    const askEn = Math.random() > 0.5;
+    const question = askEn ? w.en : w.pl;
+    const correctAnswer = askEn ? w.pl : w.en;
+
+    const pool = shuffle(getAllWords().filter(x => x.id !== w.id)).slice(0, 3);
+    const options = shuffle([correctAnswer, ...pool.map(p => askEn ? p.pl : p.en)]);
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<div class="category-tag">${w.cat}</div><h3>${question}</h3>`;
+    app.appendChild(card);
+
+    const optsCard = document.createElement("div");
+    optsCard.className = "card";
+    options.forEach(opt => {
+      const b = document.createElement("button");
+      b.className = "quiz-option";
+      b.textContent = opt;
+      b.onclick = () => {
+        if (answered) return;
+        answered
