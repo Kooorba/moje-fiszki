@@ -119,8 +119,17 @@ function shuffle(arr) {
   return a;
 }
 
+
 function masteredCount() {
-  return getAllWords().filter(function(w) { return getWordState(w.id).level >= 4; }).length;
+  return getAllWords().filter(function(w) { return getWordState(w.id).level >= 3; }).length;
+}
+function inProgressCount() {
+  return getAllWords().filter(function(w) { var l = getWordState(w.id).level; return l >= 1 && l <= 2; }).length;
+}
+function newCount() {
+  return getAllWords().filter(function(w) { return getWordState(w.id).level === 0; }).length;
+}
+
 }
 
 var app = document.getElementById("app");
@@ -138,22 +147,28 @@ function backButton() {
   return b;
 }
 
+
 function renderMenu() {
   var total = getAllWords().length;
   var mastered = masteredCount();
+  var inProgress = inProgressCount();
+  var fresh = newCount();
   var due = dueWords().length;
 
   var card = document.createElement("div");
   card.className = "card";
   card.innerHTML =
     '<div class="stats">' +
+      '<span>Nowe: ' + fresh + '</span>' +
+      '<span>W trakcie nauki: ' + inProgress + '</span>' +
       '<span>Opanowane: ' + mastered + ' / ' + total + '</span>' +
-      '<span>Do powtorki dzis: ' + due + '</span>' +
     '</div>' +
     '<div class="progress-bar-bg">' +
       '<div class="progress-bar-fill" style="width:' + Math.round(mastered/total*100) + '%"></div>' +
-    '</div>';
+    '</div>' +
+    '<p style="font-size:12px;color:#888;margin-top:8px;">Do powtorki dzis: ' + due + ' slowek</p>';
   app.appendChild(card);
+
 
   var menuCard = document.createElement("div");
   menuCard.className = "card";
