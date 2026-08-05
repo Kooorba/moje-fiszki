@@ -1,210 +1,72 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>100 słówek EN - Trener słownictwa</title>
+<title>100 slowek EN - Trener slownictwa</title>
 <script src="words.js"></script>
 <style>
   * { box-sizing: border-box; }
-  body {
-    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    background: #f4f5fa;
-    margin: 0;
-    padding: 0;
-    color: #222;
-  }
-  header {
-    background: linear-gradient(135deg, #2649B2, #8E7DE3);
-    color: white;
-    padding: 20px;
-    text-align: center;
-  }
+  body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f4f5fa; margin: 0; padding: 0; color: #222; }
+  header { background: linear-gradient(135deg, #2649B2, #8E7DE3); color: white; padding: 20px; text-align: center; }
   header h1 { margin: 0; font-size: 22px; }
   header p { margin: 4px 0 0; opacity: 0.9; font-size: 13px; }
-  .container {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 16px;
-  }
-  .card {
-    background: white;
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-  }
-  .menu-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .menu-btn {
-    background: #2649B2;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 18px 10px;
-    font-size: 14px;
-    cursor: pointer;
-    text-align: center;
-  }
+  .container { max-width: 700px; margin: 0 auto; padding: 16px; }
+  .card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .menu-btn { background: #2649B2; color: white; border: none; border-radius: 12px; padding: 18px 10px; font-size: 14px; cursor: pointer; text-align: center; }
   .menu-btn:hover { background: #4A74F3; }
   .menu-btn.secondary { background: #9D5CE6; }
   .menu-btn.secondary:hover { background: #B55CE6; }
-  .stats {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    color: #555;
-    margin-bottom: 10px;
-  }
-  .progress-bar-bg {
-    background: #D4D9F0;
-    border-radius: 10px;
-    height: 10px;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-  .progress-bar-fill {
-    background: #4A74F3;
-    height: 100%;
-  }
-  button.action {
-    background: #2649B2;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 18px;
-    font-size: 14px;
-    cursor: pointer;
-    margin: 4px;
-  }
+  .stats { display: flex; justify-content: space-between; font-size: 13px; color: #555; margin-bottom: 10px; }
+  .progress-bar-bg { background: #D4D9F0; border-radius: 10px; height: 10px; overflow: hidden; margin-bottom: 10px; }
+  .progress-bar-fill { background: #4A74F3; height: 100%; }
+  button.action { background: #2649B2; color: white; border: none; border-radius: 8px; padding: 12px 18px; font-size: 14px; cursor: pointer; margin: 4px; }
   button.action:hover { background: #4A74F3; }
-  button.ghost {
-    background: white;
-    color: #2649B2;
-    border: 2px solid #2649B2;
-  }
+  button.ghost { background: white; color: #2649B2; border: 2px solid #2649B2; }
   button.correct { background: #2649B2; }
   button.wrong { background: #B55CE6; }
-  input[type=text] {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-    margin-bottom: 10px;
-  }
-  .flashcard {
-    background: #f4f5fa;
-    border: 2px solid #4A74F3;
-    border-radius: 14px;
-    padding: 40px 20px;
-    text-align: center;
-    font-size: 22px;
-    margin-bottom: 16px;
-    min-height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .quiz-option {
-    display: block;
-    width: 100%;
-    text-align: left;
-    background: white;
-    border: 2px solid #D4D9F0;
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    font-size: 14px;
-  }
+  input[type=text] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 15px; margin-bottom: 10px; }
+  .flashcard { background: #f4f5fa; border: 2px solid #4A74F3; border-radius: 14px; padding: 40px 20px; text-align: center; font-size: 22px; margin-bottom: 16px; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+  .quiz-option { display: block; width: 100%; text-align: left; background: white; border: 2px solid #D4D9F0; border-radius: 10px; padding: 12px; margin-bottom: 8px; cursor: pointer; font-size: 14px; }
   .quiz-option:hover { border-color: #4A74F3; }
   .quiz-option.correct { border-color: #2649B2; background: #D4D9F0; }
   .quiz-option.wrong { border-color: #B55CE6; background: #f5e6fb; }
-  .word-chip {
-    display: inline-block;
-    background: white;
-    border: 2px solid #8E7DE3;
-    border-radius: 8px;
-    padding: 8px 12px;
-    margin: 4px;
-    cursor: pointer;
-    font-size: 14px;
-  }
+  .word-chip { display: inline-block; background: white; border: 2px solid #8E7DE3; border-radius: 8px; padding: 8px 12px; margin: 4px; cursor: pointer; font-size: 14px; }
   .word-chip.used { opacity: 0.3; pointer-events: none; }
-  .sentence-slot {
-    min-height: 50px;
-    border: 2px dashed #9D5CE6;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 12px;
-    font-size: 15px;
-  }
+  .sentence-slot { min-height: 50px; border: 2px dashed #9D5CE6; border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 15px; }
   .feedback { font-weight: bold; margin-top: 10px; }
   .feedback.ok { color: #2649B2; }
   .feedback.bad { color: #B55CE6; }
-  .category-tag {
-    display: inline-block;
-    background: #D4D9F0;
-    color: #2649B2;
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-  }
-  .back-btn {
-    background: none;
-    border: none;
-    color: #2649B2;
-    font-size: 14px;
-    cursor: pointer;
-    margin-bottom: 10px;
-    padding: 0;
-  }
-  textarea {
-    width: 100%;
-    min-height: 80px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-  }
-  .lt-issue {
-    background: #f5e6fb;
-    border-left: 4px solid #B55CE6;
-    padding: 8px 10px;
-    margin-top: 8px;
-    border-radius: 6px;
-    font-size: 13px;
-  }
+  .category-tag { display: inline-block; background: #D4D9F0; color: #2649B2; font-size: 11px; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; }
+  .back-btn { background: none; border: none; color: #2649B2; font-size: 14px; cursor: pointer; margin-bottom: 10px; padding: 0; }
+  textarea { width: 100%; min-height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; }
+  .lt-issue { background: #f5e6fb; border-left: 4px solid #B55CE6; padding: 8px 10px; margin-top: 8px; border-radius: 6px; font-size: 13px; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🎓 Trener 100 słówek biznesowego angielskiego</h1>
-  <p>Ucz się, powtarzaj, sprawdzaj swoje postępy</p>
+  <h1>Trener 100 slowek biznesowego angielskiego</h1>
+  <p>Ucz sie, powtarzaj, sprawdzaj swoje postepy</p>
 </header>
 
 <div class="container" id="app"></div>
 
 <script>
-// ---------- DANE I STAN ----------
-const STORAGE_KEY = "word_trainer_progress_v1";
-const CUSTOM_WORDS_KEY = "word_trainer_custom_words_v1";
+var STORAGE_KEY = "word_trainer_progress_v1";
+var CUSTOM_WORDS_KEY = "word_trainer_custom_words_v1";
 
 function loadProgress() {
-  const raw = localStorage.getItem(STORAGE_KEY);
+  var raw = localStorage.getItem(STORAGE_KEY);
   return raw ? JSON.parse(raw) : {};
 }
 function saveProgress(p) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
 }
 function loadCustomWords() {
-  const raw = localStorage.getItem(CUSTOM_WORDS_KEY);
+  var raw = localStorage.getItem(CUSTOM_WORDS_KEY);
   return raw ? JSON.parse(raw) : [];
 }
 function saveCustomWords(list) {
@@ -214,7 +76,7 @@ function getAllWords() {
   return WORDS_DATA.concat(loadCustomWords());
 }
 
-let progress = loadProgress();
+var progress = loadProgress();
 
 function getWordState(id) {
   if (!progress[id]) {
@@ -223,10 +85,10 @@ function getWordState(id) {
   return progress[id];
 }
 
-const INTERVAL_DAYS = [0, 1, 3, 7, 14, 30, 90];
+var INTERVAL_DAYS = [0, 1, 3, 7, 14, 30, 90];
 
 function reviewWord(id, wasCorrect) {
-  const state = getWordState(id);
+  var state = getWordState(id);
   state.seen += 1;
   if (wasCorrect) {
     state.correct += 1;
@@ -234,137 +96,133 @@ function reviewWord(id, wasCorrect) {
   } else {
     state.level = Math.max(state.level - 2, 0);
   }
-  const now = Date.now();
+  var now = Date.now();
   state.nextReview = now + INTERVAL_DAYS[state.level] * 24 * 60 * 60 * 1000;
   progress[id] = state;
   saveProgress(progress);
 }
 
 function dueWords() {
-  const now = Date.now();
-  return getAllWords().filter(w => {
-    const s = getWordState(w.id);
+  var now = Date.now();
+  return getAllWords().filter(function(w) {
+    var s = getWordState(w.id);
     return s.nextReview <= now;
   });
 }
 
 function shuffle(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
   }
   return a;
 }
 
 function masteredCount() {
-  return getAllWords().filter(w => getWordState(w.id).level >= 4).length;
+  return getAllWords().filter(function(w) { return getWordState(w.id).level >= 4; }).length;
 }
 
-// ---------- RENDER ROUTER ----------
-const app = document.getElementById("app");
+var app = document.getElementById("app");
 
 function render(view) {
   app.innerHTML = "";
   view();
 }
 
-function backButton(target) {
-  const b = document.createElement("button");
+function backButton() {
+  var b = document.createElement("button");
   b.className = "back-btn";
-  b.textContent = "← Powrót do menu";
-  b.onclick = () => render(renderMenu);
+  b.textContent = "Powrot do menu";
+  b.onclick = function() { render(renderMenu); };
   return b;
 }
 
-// ---------- MENU GŁÓWNE ----------
 function renderMenu() {
-  const total = getAllWords().length;
-  const mastered = masteredCount();
-  const due = dueWords().length;
+  var total = getAllWords().length;
+  var mastered = masteredCount();
+  var due = dueWords().length;
 
-  const card = document.createElement("div");
+  var card = document.createElement("div");
   card.className = "card";
-  card.innerHTML = `
-    <div class="stats">
-      <span>Opanowane: ${mastered} / ${total}</span>
-      <span>Do powtórki dziś: ${due}</span>
-    </div>
-    <div class="progress-bar-bg">
-      <div class="progress-bar-fill" style="width:${Math.round(mastered/total*100)}%"></div>
-    </div>
-  `;
+  card.innerHTML =
+    '<div class="stats">' +
+      '<span>Opanowane: ' + mastered + ' / ' + total + '</span>' +
+      '<span>Do powtorki dzis: ' + due + '</span>' +
+    '</div>' +
+    '<div class="progress-bar-bg">' +
+      '<div class="progress-bar-fill" style="width:' + Math.round(mastered/total*100) + '%"></div>' +
+    '</div>';
   app.appendChild(card);
 
-  const menuCard = document.createElement("div");
+  var menuCard = document.createElement("div");
   menuCard.className = "card";
-  menuCard.innerHTML = `<div class="menu-grid" id="menuGrid"></div>`;
+  var grid = document.createElement("div");
+  grid.className = "menu-grid";
+  menuCard.appendChild(grid);
   app.appendChild(menuCard);
 
-  const grid = document.getElementById("menuGrid");
-  const items = [
-    { label: "🃏 Fiszki EN → PL", action: () => startFlashcards("en") },
-    { label: "🃏 Fiszki PL → EN", action: () => startFlashcards("pl") },
-    { label: "❓ Quiz wielokrotnego wyboru", action: () => startQuiz() },
-    { label: "✍ Uzupełnij lukę w zdaniu", action: () => startGapFill() },
-    { label: "🔤 Wpisz słowo z pamięci", action: () => startTyping() },
-    { label: "🧩 Ułóż zdanie", action: () => startSentenceBuilder() },
-    { label: "➕ Dodaj nowe słowo", action: () => renderAddWord() },
-    { label: "🛠 Sprawdź zdanie (LanguageTool)", action: () => renderGrammarCheck() },
+  var items = [
+    { label: "Fiszki EN -> PL", action: function(){ startFlashcards("en"); }, secondary:false },
+    { label: "Fiszki PL -> EN", action: function(){ startFlashcards("pl"); }, secondary:false },
+    { label: "Quiz wielokrotnego wyboru", action: startQuiz, secondary:false },
+    { label: "Uzupelnij luke w zdaniu", action: startGapFill, secondary:false },
+    { label: "Wpisz slowo z pamieci", action: startTyping, secondary:false },
+    { label: "Uloz zdanie", action: startSentenceBuilder, secondary:false },
+    { label: "Dodaj nowe slowo", action: renderAddWord, secondary:true },
+    { label: "Sprawdz zdanie (LanguageTool)", action: renderGrammarCheck, secondary:true }
   ];
-  items.forEach(it => {
-    const b = document.createElement("button");
-    b.className = "menu-btn" + (it.label.startsWith("➕") || it.label.startsWith("🛠") ? " secondary" : "");
+  items.forEach(function(it) {
+    var b = document.createElement("button");
+    b.className = "menu-btn" + (it.secondary ? " secondary" : "");
     b.textContent = it.label;
     b.onclick = it.action;
     grid.appendChild(b);
   });
 }
 
-// ---------- FISZKI ----------
 function startFlashcards(direction) {
-  let queue = shuffle(dueWords().length ? dueWords() : getAllWords());
-  let idx = 0;
-  let showingAnswer = false;
+  var queue = shuffle(dueWords().length ? dueWords() : getAllWords());
+  var idx = 0;
+  var showingAnswer = false;
 
   function draw() {
     app.innerHTML = "";
     app.appendChild(backButton());
     if (idx >= queue.length) {
-      const done = document.createElement("div");
+      var done = document.createElement("div");
       done.className = "card";
-      done.innerHTML = "<p>🎉 Skończyłeś tę sesję fiszek! Wróć do menu lub zacznij ponownie.</p>";
+      done.innerHTML = "<p>Skonczyles te sesje fiszek. Wroc do menu lub zacznij ponownie.</p>";
       app.appendChild(done);
       return;
     }
-    const w = queue[idx];
-    const card = document.createElement("div");
+    var w = queue[idx];
+    var card = document.createElement("div");
     card.className = "card";
-    const front = direction === "en" ? w.en : w.pl;
-    const back = direction === "en" ? w.pl : w.en;
-    card.innerHTML = `
-      <div class="category-tag">${w.cat}</div>
-      <div class="flashcard" id="flashcardText">${showingAnswer ? back : front}</div>
-      <p style="font-size:13px;color:#666;">${showingAnswer ? (direction === "en" ? w.sentence_en : w.sentence_pl) : ""}</p>
-    `;
+    var front = direction === "en" ? w.en : w.pl;
+    var back = direction === "en" ? w.pl : w.en;
+    card.innerHTML =
+      '<div class="category-tag">' + w.cat + '</div>' +
+      '<div class="flashcard">' + (showingAnswer ? back : front) + '</div>' +
+      '<p style="font-size:13px;color:#666;">' + (showingAnswer ? (direction === "en" ? w.sentence_en : w.sentence_pl) : "") + '</p>';
     app.appendChild(card);
 
     if (!showingAnswer) {
-      const btn = document.createElement("button");
+      var btn = document.createElement("button");
       btn.className = "action";
-      btn.textContent = "Pokaż odpowiedź";
-      btn.onclick = () => { showingAnswer = true; draw(); };
+      btn.textContent = "Pokaz odpowiedz";
+      btn.onclick = function() { showingAnswer = true; draw(); };
       app.appendChild(btn);
     } else {
-      const btnGood = document.createElement("button");
+      var btnGood = document.createElement("button");
       btnGood.className = "action correct";
-      btnGood.textContent = "✅ Wiedziałem";
-      btnGood.onclick = () => { reviewWord(w.id, true); showingAnswer = false; idx++; draw(); };
+      btnGood.textContent = "Wiedzialem";
+      btnGood.onclick = function() { reviewWord(w.id, true); showingAnswer = false; idx++; draw(); };
 
-      const btnBad = document.createElement("button");
+      var btnBad = document.createElement("button");
       btnBad.className = "action wrong";
-      btnBad.textContent = "❌ Nie wiedziałem";
-      btnBad.onclick = () => { reviewWord(w.id, false); showingAnswer = false; idx++; draw(); };
+      btnBad.textContent = "Nie wiedzialem";
+      btnBad.onclick = function() { reviewWord(w.id, false); showingAnswer = false; idx++; draw(); };
 
       app.appendChild(btnGood);
       app.appendChild(btnBad);
@@ -373,41 +231,313 @@ function startFlashcards(direction) {
   draw();
 }
 
-// ---------- QUIZ ----------
 function startQuiz() {
-  let queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
-  let idx = 0;
-  let answered = false;
+  var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
+  var idx = 0;
+  var answered = false;
 
   function draw() {
     app.innerHTML = "";
     app.appendChild(backButton());
     if (idx >= queue.length) {
-      const done = document.createElement("div");
+      var done = document.createElement("div");
       done.className = "card";
-      done.innerHTML = "<p>🎉 Koniec quizu! Wróć do menu, aby zagrać ponownie.</p>";
+      done.innerHTML = "<p>Koniec quizu. Wroc do menu, aby zagrac ponownie.</p>";
       app.appendChild(done);
       return;
     }
-    const w = queue[idx];
-    const askEn = Math.random() > 0.5;
-    const question = askEn ? w.en : w.pl;
-    const correctAnswer = askEn ? w.pl : w.en;
+    var w = queue[idx];
+    var askEn = Math.random() > 0.5;
+    var question = askEn ? w.en : w.pl;
+    var correctAnswer = askEn ? w.pl : w.en;
 
-    const pool = shuffle(getAllWords().filter(x => x.id !== w.id)).slice(0, 3);
-    const options = shuffle([correctAnswer, ...pool.map(p => askEn ? p.pl : p.en)]);
+    var pool = shuffle(getAllWords().filter(function(x){ return x.id !== w.id; })).slice(0, 3);
+    var options = shuffle([correctAnswer].concat(pool.map(function(p){ return askEn ? p.pl : p.en; })));
 
-    const card = document.createElement("div");
+    var card = document.createElement("div");
     card.className = "card";
-    card.innerHTML = `<div class="category-tag">${w.cat}</div><h3>${question}</h3>`;
+    card.innerHTML = '<div class="category-tag">' + w.cat + '</div><h3>' + question + '</h3>';
     app.appendChild(card);
 
-    const optsCard = document.createElement("div");
+    var optsCard = document.createElement("div");
     optsCard.className = "card";
-    options.forEach(opt => {
-      const b = document.createElement("button");
+    options.forEach(function(opt) {
+      var b = document.createElement("button");
       b.className = "quiz-option";
       b.textContent = opt;
-      b.onclick = () => {
+      b.onclick = function() {
         if (answered) return;
-        answered
+        answered = true;
+        var isCorrect = opt === correctAnswer;
+        b.classList.add(isCorrect ? "correct" : "wrong");
+        reviewWord(w.id, isCorrect);
+        if (!isCorrect) {
+          Array.prototype.forEach.call(optsCard.children, function(c) {
+            if (c.textContent === correctAnswer) c.classList.add("correct");
+          });
+        }
+        setTimeout(function() { answered = false; idx++; draw(); }, 900);
+      };
+      optsCard.appendChild(b);
+    });
+    app.appendChild(optsCard);
+  }
+  draw();
+}
+
+function startGapFill() {
+  var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
+  var idx = 0;
+
+  function draw() {
+    app.innerHTML = "";
+    app.appendChild(backButton());
+    if (idx >= queue.length) {
+      var done = document.createElement("div");
+      done.className = "card";
+      done.innerHTML = "<p>Koniec cwiczenia. Wroc do menu.</p>";
+      app.appendChild(done);
+      return;
+    }
+    var w = queue[idx];
+    var mainWord = w.en.split(" / ")[0].replace("To ", "").split(" (")[0];
+    var regex = new RegExp(mainWord, "i");
+    var gapped = w.sentence_en.replace(regex, "_____");
+
+    var card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      '<div class="category-tag">' + w.cat + '</div>' +
+      '<p style="font-size:13px;color:#666;">Tlumaczenie: ' + w.pl + '</p>' +
+      '<p style="font-size:17px;">' + gapped + '</p>' +
+      '<input type="text" id="gapInput" placeholder="Wpisz brakujace slowo po angielsku">' +
+      '<button class="action" id="checkGap">Sprawdz</button>' +
+      '<div id="gapFeedback"></div>';
+    app.appendChild(card);
+
+    document.getElementById("checkGap").onclick = function() {
+      var val = document.getElementById("gapInput").value.trim().toLowerCase();
+      var isCorrect = mainWord.toLowerCase().indexOf(val) !== -1 || val.indexOf(mainWord.toLowerCase()) !== -1;
+      reviewWord(w.id, isCorrect);
+      var fb = document.getElementById("gapFeedback");
+      fb.className = "feedback " + (isCorrect ? "ok" : "bad");
+      fb.textContent = isCorrect ? "Dobrze!" : ("Poprawna odpowiedz: " + mainWord);
+      var nextBtn = document.createElement("button");
+      nextBtn.className = "action";
+      nextBtn.textContent = "Dalej";
+      nextBtn.onclick = function() { idx++; draw(); };
+      app.appendChild(nextBtn);
+    };
+  }
+  draw();
+}
+
+function startTyping() {
+  var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
+  var idx = 0;
+
+  function draw() {
+    app.innerHTML = "";
+    app.appendChild(backButton());
+    if (idx >= queue.length) {
+      var done = document.createElement("div");
+      done.className = "card";
+      done.innerHTML = "<p>Koniec cwiczenia. Wroc do menu.</p>";
+      app.appendChild(done);
+      return;
+    }
+    var w = queue[idx];
+    var card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      '<div class="category-tag">' + w.cat + '</div>' +
+      '<p style="font-size:13px;color:#666;">Napisz po angielsku:</p>' +
+      '<h3>' + w.pl + '</h3>' +
+      '<input type="text" id="typeInput" placeholder="Wpisz odpowiedz po angielsku">' +
+      '<button class="action" id="checkType">Sprawdz</button>' +
+      '<div id="typeFeedback"></div>';
+    app.appendChild(card);
+
+    document.getElementById("checkType").onclick = function() {
+      var val = document.getElementById("typeInput").value.trim().toLowerCase();
+      var correctVal = w.en.toLowerCase();
+      var isCorrect = (val === correctVal) || (correctVal.indexOf(val) !== -1 && val.length > 3);
+      reviewWord(w.id, isCorrect);
+      var fb = document.getElementById("typeFeedback");
+      fb.className = "feedback " + (isCorrect ? "ok" : "bad");
+      fb.textContent = isCorrect ? "Dobrze!" : ("Poprawna odpowiedz: " + w.en);
+      var nextBtn = document.createElement("button");
+      nextBtn.className = "action";
+      nextBtn.textContent = "Dalej";
+      nextBtn.onclick = function() { idx++; draw(); };
+      app.appendChild(nextBtn);
+    };
+  }
+  draw();
+}
+
+function startSentenceBuilder() {
+  var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 10);
+  var idx = 0;
+
+  function draw() {
+    app.innerHTML = "";
+    app.appendChild(backButton());
+    if (idx >= queue.length) {
+      var done = document.createElement("div");
+      done.className = "card";
+      done.innerHTML = "<p>Koniec cwiczenia. Wroc do menu.</p>";
+      app.appendChild(done);
+      return;
+    }
+    var w = queue[idx];
+    var words = w.sentence_en.replace(/[.,!?]/g, "").split(" ");
+    var shuffled = shuffle(words);
+    var built = [];
+
+    var card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      '<div class="category-tag">' + w.cat + '</div>' +
+      '<p style="font-size:13px;color:#666;">Uloz zdanie zawierajace: <b>' + w.en + '</b> (' + w.pl + ')</p>' +
+      '<div class="sentence-slot" id="builtSentence"></div>' +
+      '<div id="chipsArea"></div>' +
+      '<button class="action ghost" id="resetBtn">Wyczysc</button>' +
+      '<button class="action" id="checkSentence">Sprawdz</button>' +
+      '<div id="sentFeedback"></div>';
+    app.appendChild(card);
+
+    var chipsArea = document.getElementById("chipsArea");
+    var builtDiv = document.getElementById("builtSentence");
+
+    function renderChips() {
+      chipsArea.innerHTML = "";
+      shuffled.forEach(function(word, i) {
+        var chip = document.createElement("span");
+        chip.className = "word-chip" + (built.indexOf(i) !== -1 ? " used" : "");
+        chip.textContent = word;
+        chip.onclick = function() {
+          if (built.indexOf(i) !== -1) return;
+          built.push(i);
+          builtDiv.textContent = built.map(function(bi){ return shuffled[bi]; }).join(" ");
+          renderChips();
+        };
+        chipsArea.appendChild(chip);
+      });
+    }
+    renderChips();
+
+    document.getElementById("resetBtn").onclick = function() {
+      built = [];
+      builtDiv.textContent = "";
+      renderChips();
+    };
+
+    document.getElementById("checkSentence").onclick = function() {
+      var result = built.map(function(bi){ return shuffled[bi]; }).join(" ").toLowerCase();
+      var target = words.join(" ").toLowerCase();
+      var isCorrect = result === target;
+      reviewWord(w.id, isCorrect);
+      var fb = document.getElementById("sentFeedback");
+      fb.className = "feedback " + (isCorrect ? "ok" : "bad");
+      fb.textContent = isCorrect ? "Swietnie, dobra kolejnosc!" : ("Poprawne zdanie: " + w.sentence_en);
+      var nextBtn = document.createElement("button");
+      nextBtn.className = "action";
+      nextBtn.textContent = "Dalej";
+      nextBtn.onclick = function() { idx++; draw(); };
+      app.appendChild(nextBtn);
+    };
+  }
+  draw();
+}
+
+function renderAddWord() {
+  app.innerHTML = "";
+  app.appendChild(backButton());
+  var card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML =
+    '<h3>Dodaj nowe slowo</h3>' +
+    '<p style="font-size:13px;color:#666;">Strona nie generuje zdan automatycznie. Wpisz wlasne zdanie przykladowe.</p>' +
+    '<input type="text" id="newEn" placeholder="Slowo/fraza po angielsku">' +
+    '<input type="text" id="newPl" placeholder="Tlumaczenie po polsku">' +
+    '<input type="text" id="newCat" placeholder="Kategoria (np. Finance and KPIs)">' +
+    '<textarea id="newSentEn" placeholder="Przykladowe zdanie po angielsku"></textarea><br><br>' +
+    '<textarea id="newSentPl" placeholder="Tlumaczenie tego zdania po polsku"></textarea><br><br>' +
+    '<button class="action" id="saveWordBtn">Zapisz slowo</button>' +
+    '<div id="addFeedback"></div>';
+  app.appendChild(card);
+
+  document.getElementById("saveWordBtn").onclick = function() {
+    var en = document.getElementById("newEn").value.trim();
+    var pl = document.getElementById("newPl").value.trim();
+    var cat = document.getElementById("newCat").value.trim() || "Custom";
+    var sentence_en = document.getElementById("newSentEn").value.trim();
+    var sentence_pl = document.getElementById("newSentPl").value.trim();
+
+    if (!en || !pl || !sentence_en || !sentence_pl) {
+      document.getElementById("addFeedback").innerHTML = "<p class='feedback bad'>Uzupelnij wszystkie pola.</p>";
+      return;
+    }
+    var customWords = loadCustomWords();
+    var newId = 1000 + customWords.length;
+    customWords.push({ id: newId, en: en, pl: pl, cat: cat, sentence_en: sentence_en, sentence_pl: sentence_pl });
+    saveCustomWords(customWords);
+    document.getElementById("addFeedback").innerHTML = "<p class='feedback ok'>Dodano! Slowo pojawi sie teraz we wszystkich trybach nauki.</p>";
+    document.getElementById("newEn").value = "";
+    document.getElementById("newPl").value = "";
+    document.getElementById("newCat").value = "";
+    document.getElementById("newSentEn").value = "";
+    document.getElementById("newSentPl").value = "";
+  };
+}
+
+function renderGrammarCheck() {
+  app.innerHTML = "";
+  app.appendChild(backButton());
+  var card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML =
+    '<h3>Sprawdz swoje zdanie</h3>' +
+    '<p style="font-size:13px;color:#666;">Wpisz zdanie po angielsku. To narzedzie automatyczne, traktuj wynik jako wskazowke.</p>' +
+    '<textarea id="checkInput" placeholder="Np. She have finished the report yesterday."></textarea><br><br>' +
+    '<button class="action" id="checkGrammarBtn">Sprawdz zdanie</button>' +
+    '<div id="grammarResults"></div>';
+  app.appendChild(card);
+
+  document.getElementById("checkGrammarBtn").onclick = function() {
+    var text = document.getElementById("checkInput").value.trim();
+    var resultsDiv = document.getElementById("grammarResults");
+    if (!text) return;
+    resultsDiv.innerHTML = "<p>Sprawdzanie...</p>";
+    fetch("https://api.languagetool.org/v2/check", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "text=" + encodeURIComponent(text) + "&language=en-US"
+    }).then(function(response) { return response.json(); })
+      .then(function(data) {
+        if (!data.matches || data.matches.length === 0) {
+          resultsDiv.innerHTML = "<p class='feedback ok'>Nie znaleziono bledow!</p>";
+          return;
+        }
+        resultsDiv.innerHTML = "";
+        data.matches.forEach(function(m) {
+          var div = document.createElement("div");
+          div.className = "lt-issue";
+          var suggestion = (m.replacements && m.replacements.length)
+            ? ("Sugestia: <b>" + m.replacements.slice(0,3).map(function(r){ return r.value; }).join(", ") + "</b>")
+            : "Brak sugestii.";
+          div.innerHTML = "<b>" + m.message + "</b><br>" + suggestion;
+          resultsDiv.appendChild(div);
+        });
+      })
+      .catch(function(e) {
+        resultsDiv.innerHTML = "<p class='feedback bad'>Nie udalo sie polaczyc z LanguageTool. Sprawdz internet i sprobuj ponownie.</p>";
+      });
+  };
+}
+
+render(renderMenu);
+</script>
+</body>
+</html>
