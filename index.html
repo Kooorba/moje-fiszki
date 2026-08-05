@@ -231,10 +231,13 @@ function startFlashcards(direction) {
   draw();
 }
 
+
 function startQuiz() {
   var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
   var idx = 0;
   var answered = false;
+  var correctCount = 0;
+  var wrongCount = 0;
 
   function draw() {
     app.innerHTML = "";
@@ -242,7 +245,7 @@ function startQuiz() {
     if (idx >= queue.length) {
       var done = document.createElement("div");
       done.className = "card";
-      done.innerHTML = "<p>Koniec quizu. Wroc do menu, aby zagrac ponownie.</p>";
+      done.innerHTML = "<p>Koniec quizu. Wynik: " + correctCount + " poprawnych, " + wrongCount + " blednych.</p>";
       app.appendChild(done);
       return;
     }
@@ -253,6 +256,11 @@ function startQuiz() {
 
     var pool = shuffle(getAllWords().filter(function(x){ return x.id !== w.id; })).slice(0, 3);
     var options = shuffle([correctAnswer].concat(pool.map(function(p){ return askEn ? p.pl : p.en; })));
+
+    var scoreCard = document.createElement("div");
+    scoreCard.className = "card";
+    scoreCard.innerHTML = '<div class="stats"><span>Pytanie ' + (idx+1) + ' / ' + queue.length + '</span><span>Poprawne: ' + correctCount + ' | Bledne: ' + wrongCount + '</span></div>';
+    app.appendChild(scoreCard);
 
     var card = document.createElement("div");
     card.className = "card";
@@ -269,6 +277,7 @@ function startQuiz() {
         if (answered) return;
         answered = true;
         var isCorrect = opt === correctAnswer;
+        if (isCorrect) { correctCount++; } else { wrongCount++; }
         b.classList.add(isCorrect ? "correct" : "wrong");
         reviewWord(w.id, isCorrect);
         if (!isCorrect) {
@@ -276,7 +285,11 @@ function startQuiz() {
             if (c.textContent === correctAnswer) c.classList.add("correct");
           });
         }
-        setTimeout(function() { answered = false; idx++; draw(); }, 900);
+        var nextBtn = document.createElement("button");
+        nextBtn.className = "action";
+        nextBtn.textContent = "Dalej";
+        nextBtn.onclick = function() { answered = false; idx++; draw(); };
+        app.appendChild(nextBtn);
       };
       optsCard.appendChild(b);
     });
@@ -284,6 +297,7 @@ function startQuiz() {
   }
   draw();
 }
+
 
 function startGapFill() {
   var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
