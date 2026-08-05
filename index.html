@@ -299,9 +299,12 @@ function startQuiz() {
 }
 
 
+
 function startGapFill() {
   var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
   var idx = 0;
+  var correctCount = 0;
+  var wrongCount = 0;
 
   function draw() {
     app.innerHTML = "";
@@ -309,7 +312,7 @@ function startGapFill() {
     if (idx >= queue.length) {
       var done = document.createElement("div");
       done.className = "card";
-      done.innerHTML = "<p>Koniec cwiczenia. Wroc do menu.</p>";
+      done.innerHTML = "<p>Koniec cwiczenia. Wynik: " + correctCount + " poprawnych, " + wrongCount + " blednych.</p>";
       app.appendChild(done);
       return;
     }
@@ -317,6 +320,11 @@ function startGapFill() {
     var mainWord = w.en.split(" / ")[0].replace("To ", "").split(" (")[0];
     var regex = new RegExp(mainWord, "i");
     var gapped = w.sentence_en.replace(regex, "_____");
+
+    var scoreCard = document.createElement("div");
+    scoreCard.className = "card";
+    scoreCard.innerHTML = '<div class="stats"><span>Pytanie ' + (idx+1) + ' / ' + queue.length + '</span><span>Poprawne: ' + correctCount + ' | Bledne: ' + wrongCount + '</span></div>';
+    app.appendChild(scoreCard);
 
     var card = document.createElement("div");
     card.className = "card";
@@ -332,7 +340,10 @@ function startGapFill() {
     document.getElementById("checkGap").onclick = function() {
       var val = document.getElementById("gapInput").value.trim().toLowerCase();
       var isCorrect = mainWord.toLowerCase().indexOf(val) !== -1 || val.indexOf(mainWord.toLowerCase()) !== -1;
+      if (isCorrect) { correctCount++; } else { wrongCount++; }
       reviewWord(w.id, isCorrect);
+      document.getElementById("checkGap").disabled = true;
+      document.getElementById("gapInput").disabled = true;
       var fb = document.getElementById("gapFeedback");
       fb.className = "feedback " + (isCorrect ? "ok" : "bad");
       fb.textContent = isCorrect ? "Dobrze!" : ("Poprawna odpowiedz: " + mainWord);
@@ -346,9 +357,13 @@ function startGapFill() {
   draw();
 }
 
+
+
 function startTyping() {
   var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
   var idx = 0;
+  var correctCount = 0;
+  var wrongCount = 0;
 
   function draw() {
     app.innerHTML = "";
@@ -356,11 +371,17 @@ function startTyping() {
     if (idx >= queue.length) {
       var done = document.createElement("div");
       done.className = "card";
-      done.innerHTML = "<p>Koniec cwiczenia. Wroc do menu.</p>";
+      done.innerHTML = "<p>Koniec cwiczenia. Wynik: " + correctCount + " poprawnych, " + wrongCount + " blednych.</p>";
       app.appendChild(done);
       return;
     }
     var w = queue[idx];
+
+    var scoreCard = document.createElement("div");
+    scoreCard.className = "card";
+    scoreCard.innerHTML = '<div class="stats"><span>Pytanie ' + (idx+1) + ' / ' + queue.length + '</span><span>Poprawne: ' + correctCount + ' | Bledne: ' + wrongCount + '</span></div>';
+    app.appendChild(scoreCard);
+
     var card = document.createElement("div");
     card.className = "card";
     card.innerHTML =
@@ -376,7 +397,10 @@ function startTyping() {
       var val = document.getElementById("typeInput").value.trim().toLowerCase();
       var correctVal = w.en.toLowerCase();
       var isCorrect = (val === correctVal) || (correctVal.indexOf(val) !== -1 && val.length > 3);
+      if (isCorrect) { correctCount++; } else { wrongCount++; }
       reviewWord(w.id, isCorrect);
+      document.getElementById("checkType").disabled = true;
+      document.getElementById("typeInput").disabled = true;
       var fb = document.getElementById("typeFeedback");
       fb.className = "feedback " + (isCorrect ? "ok" : "bad");
       fb.textContent = isCorrect ? "Dobrze!" : ("Poprawna odpowiedz: " + w.en);
@@ -390,9 +414,13 @@ function startTyping() {
   draw();
 }
 
+
+
 function startSentenceBuilder() {
   var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 10);
   var idx = 0;
+  var correctCount = 0;
+  var wrongCount = 0;
 
   function draw() {
     app.innerHTML = "";
@@ -400,7 +428,7 @@ function startSentenceBuilder() {
     if (idx >= queue.length) {
       var done = document.createElement("div");
       done.className = "card";
-      done.innerHTML = "<p>Koniec cwiczenia. Wroc do menu.</p>";
+      done.innerHTML = "<p>Koniec cwiczenia. Wynik: " + correctCount + " poprawnych, " + wrongCount + " blednych.</p>";
       app.appendChild(done);
       return;
     }
@@ -408,6 +436,11 @@ function startSentenceBuilder() {
     var words = w.sentence_en.replace(/[.,!?]/g, "").split(" ");
     var shuffled = shuffle(words);
     var built = [];
+
+    var scoreCard = document.createElement("div");
+    scoreCard.className = "card";
+    scoreCard.innerHTML = '<div class="stats"><span>Zdanie ' + (idx+1) + ' / ' + queue.length + '</span><span>Poprawne: ' + correctCount + ' | Bledne: ' + wrongCount + '</span></div>';
+    app.appendChild(scoreCard);
 
     var card = document.createElement("div");
     card.className = "card";
@@ -451,7 +484,10 @@ function startSentenceBuilder() {
       var result = built.map(function(bi){ return shuffled[bi]; }).join(" ").toLowerCase();
       var target = words.join(" ").toLowerCase();
       var isCorrect = result === target;
+      if (isCorrect) { correctCount++; } else { wrongCount++; }
       reviewWord(w.id, isCorrect);
+      document.getElementById("checkSentence").disabled = true;
+      document.getElementById("resetBtn").disabled = true;
       var fb = document.getElementById("sentFeedback");
       fb.className = "feedback " + (isCorrect ? "ok" : "bad");
       fb.textContent = isCorrect ? "Swietnie, dobra kolejnosc!" : ("Poprawne zdanie: " + w.sentence_en);
@@ -464,6 +500,7 @@ function startSentenceBuilder() {
   }
   draw();
 }
+
 
 function renderAddWord() {
   app.innerHTML = "";
