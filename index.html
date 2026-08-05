@@ -492,6 +492,7 @@ function renderAddWord() {
   };
 }
 
+
 function renderGrammarCheck() {
   app.innerHTML = "";
   app.appendChild(backButton());
@@ -499,43 +500,19 @@ function renderGrammarCheck() {
   card.className = "card";
   card.innerHTML =
     '<h3>Sprawdz swoje zdanie</h3>' +
-    '<p style="font-size:13px;color:#666;">Wpisz zdanie po angielsku. To narzedzie automatyczne, traktuj wynik jako wskazowke.</p>' +
+    '<p style="font-size:13px;color:#666;">Wpisz zdanie po angielsku, a nastepnie kliknij przycisk. Otworzy sie strona LanguageTool z Twoim zdaniem gotowym do sprawdzenia. To narzedzie zewnetrzne i darmowe, ale wymaga jednego dodatkowego klikniecia z powodu ograniczen bezpieczenstwa nalozonych przez jego dostawce.</p>' +
     '<textarea id="checkInput" placeholder="Np. She have finished the report yesterday."></textarea><br><br>' +
-    '<button class="action" id="checkGrammarBtn">Sprawdz zdanie</button>' +
-    '<div id="grammarResults"></div>';
+    '<button class="action" id="checkGrammarBtn">Otworz sprawdzanie w LanguageTool</button>';
   app.appendChild(card);
 
   document.getElementById("checkGrammarBtn").onclick = function() {
     var text = document.getElementById("checkInput").value.trim();
-    var resultsDiv = document.getElementById("grammarResults");
     if (!text) return;
-    resultsDiv.innerHTML = "<p>Sprawdzanie...</p>";
-    fetch("https://api.languagetool.org/v2/check", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "text=" + encodeURIComponent(text) + "&language=en-US"
-    }).then(function(response) { return response.json(); })
-      .then(function(data) {
-        if (!data.matches || data.matches.length === 0) {
-          resultsDiv.innerHTML = "<p class='feedback ok'>Nie znaleziono bledow!</p>";
-          return;
-        }
-        resultsDiv.innerHTML = "";
-        data.matches.forEach(function(m) {
-          var div = document.createElement("div");
-          div.className = "lt-issue";
-          var suggestion = (m.replacements && m.replacements.length)
-            ? ("Sugestia: <b>" + m.replacements.slice(0,3).map(function(r){ return r.value; }).join(", ") + "</b>")
-            : "Brak sugestii.";
-          div.innerHTML = "<b>" + m.message + "</b><br>" + suggestion;
-          resultsDiv.appendChild(div);
-        });
-      })
-      .catch(function(e) {
-        resultsDiv.innerHTML = "<p class='feedback bad'>Nie udalo sie polaczyc z LanguageTool. Sprawdz internet i sprobuj ponownie.</p>";
-      });
+    var url = "https://languagetool.org/?text=" + encodeURIComponent(text) + "&language=en-US";
+    window.open(url, "_blank");
   };
 }
+
 
 render(renderMenu);
 </script>
