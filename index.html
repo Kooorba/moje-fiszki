@@ -165,12 +165,20 @@ function shuffle(arr) {
 }
 
 
+
 function hardWords() {
   return getAllWords().filter(function(w) {
     var s = getWordState(w.id);
-    return s.level <= 1;
+    return s.seen > 0 && (s.seen - s.correct) > 0;
+  }).sort(function(a, b) {
+    var sa = getWordState(a.id);
+    var sb = getWordState(b.id);
+    var errorsA = sa.seen - sa.correct;
+    var errorsB = sb.seen - sb.correct;
+    return errorsB - errorsA;
   });
 }
+
 
 
 function masteredCount() {
