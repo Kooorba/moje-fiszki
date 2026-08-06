@@ -110,6 +110,16 @@ function dueWords() {
   });
 }
 
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  var utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "en-US";
+  utter.rate = 0.9;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+
+
 function shuffle(arr) {
   var a = arr.slice();
   for (var i = a.length - 1; i > 0; i--) {
@@ -182,9 +192,12 @@ function renderMenu() {
     { label: "Uzupelnij luke w zdaniu", action: startGapFill, secondary:false },
     { label: "Wpisz slowo z pamieci", action: startTyping, secondary:false },
     { label: "Uloz zdanie", action: startSentenceBuilder, secondary:false },
+   
     { label: "Dodaj nowe slowo", action: renderAddWord, secondary:true },
-    { label: "Sprawdz zdanie (LanguageTool)", action: renderGrammarCheck, secondary:true }
+    { label: "Sprawdz zdanie (LanguageTool)", action: renderGrammarCheck, secondary:true },
+    { label: "Kopia zapasowa postepu", action: renderBackup, secondary:true }
   ];
+
   items.forEach(function(it) {
     var b = document.createElement("button");
     b.className = "menu-btn" + (it.secondary ? " secondary" : "");
@@ -214,13 +227,20 @@ function startFlashcards(direction) {
     card.className = "card";
     var front = direction === "en" ? w.en : w.pl;
     var back = direction === "en" ? w.pl : w.en;
+    
     card.innerHTML =
       '<div class="category-tag">' + w.cat + '</div>' +
       '<div class="flashcard">' + (showingAnswer ? back : front) + '</div>' +
-      '<p style="font-size:13px;color:#666;">' + (showingAnswer ? (direction === "en" ? w.sentence_en : w.sentence_pl) : "") + '</p>';
+      '<p style="font-size:13px;color:#666;">' + (showingAnswer ? (direction === "en" ? w.sentence_en : w.sentence_pl) : "") + '</p>' +
+      '<button class="action ghost" id="speakBtn">Odsluchaj po angielsku</button>';
     app.appendChild(card);
 
+    document.getElementById("speakBtn").onclick = function() {
+      speak(w.en.replace(/\\s*\\(.*?\\)\\s*/g, "").split(" / ")[0]);
+    };
+
     if (!showingAnswer) {
+
       var btn = document.createElement("button");
       btn.className = "action";
       btn.textContent = "Pokaz odpowiedz";
@@ -512,6 +532,79 @@ function startSentenceBuilder() {
     };
   }
   draw();
+}
+
+
+function exportProgress() {
+  var payload = {
+    progress: progress,
+    customWords: loadCustomWords(),
+    exportedAt: new Date().toISOString()
+  };
+  var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "postep-slowka-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importProgress(file, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      if (data.progress) {
+        progress = data.progress;
+        saveProgress(progress);
+      }
+      if (data.customWords) {
+        saveCustomWords(data.customWords);
+      }
+      callback(true);
+    } catch (err) {
+      callback(false);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function renderBackup() {
+  app.innerHTML = "";
+  app.appendChild(backButton());
+  var card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML =
+    '<h3>Kopia zapasowa postepu</h3>' +
+    '<p style="font-size:13px;color:#666;">Pobierz plik z Twoim postepem, aby przeniesc go na inne urzadzenie lub zabezpieczyc przed utrata danych.</p>' +
+    '<button class="action" id="exportBtn">Pobierz moj postep</button>' +
+    '<hr style="margin:20px 0;border:none;border-top:1px solid #eee;">' +
+    '<p style="font-size:13px;color:#666;">Wczytaj wczesniej pobrany plik, aby przywrocic postep na tym urzadzeniu. Uwaga, to nadpisze obecny postep w tej przegladarce.</p>' +
+    '<input type="file" id="importFile" accept=".json">' +
+    '<button class="action" id="importBtn">Wczytaj postep</button>' +
+    '<div id="backupFeedback"></div>';
+  app.appendChild(card);
+
+  document.getElementById("exportBtn").onclick = exportProgress;
+
+  document.getElementById("importBtn").onclick = function() {
+    var fileInput = document.getElementById("importFile");
+    var fb = document.getElementById("backupFeedback");
+    if (!fileInput.files || !fileInput.files[0]) {
+      fb.innerHTML = "<p class='feedback bad'>Wybierz najpierw plik.</p>";
+      return;
+    }
+    importProgress(fileInput.files[0], function(success) {
+      if (success) {
+        fb.innerHTML = "<p class='feedback ok'>Postep zostal wczytany! Wroc do menu, aby zobaczyc zmiany.</p>";
+      } else {
+        fb.innerHTML = "<p class='feedback bad'>Nie udalo sie odczytac pliku. Upewnij sie, ze to plik pobrany z tego narzedzia.</p>";
+      }
+    });
+  };
 }
 
 
