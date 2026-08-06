@@ -630,23 +630,64 @@ function importProgress(file, callback) {
   reader.readAsText(file);
 }
 
+
 function renderWeakSpots() {
   app.innerHTML = "";
   app.appendChild(backButton());
   var weak = hardWords();
 
-  var card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = '<h3>Twoje slabe punkty</h3><p style="font-size:13px;color:#666;">Slowka, ktore najczesciej sprawiaja Ci trudnosc (poziom 0-1). Znaleziono: ' + weak.length + '</p>';
-  app.appendChild(card);
+  var headerCard = document.createElement("div");
+  headerCard.className = "card";
+  headerCard.innerHTML = '<h3>Twoje slabe punkty</h3><p style="font-size:13px;color:#666;">Slowka, w ktorych popelniles co najmniej jeden blad. Znaleziono: ' + weak.length + '</p>';
+  app.appendChild(headerCard);
 
   if (weak.length === 0) {
     var okCard = document.createElement("div");
     okCard.className = "card";
-    okCard.innerHTML = "<p>Brawo, nie masz obecnie zadnych slabych punktow! Wroc do menu i kontynuuj nauke.</p>";
+    okCard.innerHTML = "<p>Nie masz jeszcze zadnych slabych punktow. Pojawia sie tutaj, gdy pomylisz sie w jakims cwiczeniu.</p>";
     app.appendChild(okCard);
     return;
   }
+
+  var trainBtn = document.createElement("button");
+  trainBtn.className = "action";
+  trainBtn.textContent = "Cwicz tylko te slowka (fiszki)";
+  trainBtn.style.marginBottom = "12px";
+  trainBtn.onclick = function() { startFlashcards("en", true); };
+  app.appendChild(trainBtn);
+
+  var top10 = weak.slice(0, 10);
+  var rest = weak.slice(10);
+
+  var topCard = document.createElement("div");
+  topCard.className = "card";
+  topCard.innerHTML = '<h4 style="margin-top:0;">Top 10 najtrudniejszych</h4>';
+  top10.forEach(function(w, i) {
+    var s = getWordState(w.id);
+    var row = document.createElement("div");
+    row.style.padding = "10px 0";
+    row.style.borderBottom = "1px solid #eee";
+    row.innerHTML = '<b>' + (i+1) + '. ' + w.en + '</b> - ' + w.pl + ' <span style="color:#B55CE6;font-size:12px;">(bledy: ' + (s.seen - s.correct) + ')</span> <div class="category-tag">' + w.cat + '</div>';
+    topCard.appendChild(row);
+  });
+  app.appendChild(topCard);
+
+  if (rest.length > 0) {
+    var restCard = document.createElement("div");
+    restCard.className = "card";
+    restCard.innerHTML = '<h4 style="margin-top:0;">Pozostale slowka do poprawy</h4>';
+    rest.forEach(function(w) {
+      var s = getWordState(w.id);
+      var row = document.createElement("div");
+      row.style.padding = "8px 0";
+      row.style.borderBottom = "1px solid #eee";
+      row.innerHTML = '<b>' + w.en + '</b> - ' + w.pl + ' <span style="color:#B55CE6;font-size:12px;">(bledy: ' + (s.seen - s.correct) + ')</span>';
+      restCard.appendChild(row);
+    });
+    app.appendChild(restCard);
+  }
+}
+
 
   var listCard = document.createElement("div");
   listCard.className = "card";
