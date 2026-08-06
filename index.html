@@ -688,26 +688,6 @@ function renderWeakSpots() {
   }
 }
 
-
-  var listCard = document.createElement("div");
-  listCard.className = "card";
-  weak.forEach(function(w) {
-    var s = getWordState(w.id);
-    var row = document.createElement("div");
-    row.style.padding = "10px 0";
-    row.style.borderBottom = "1px solid #eee";
-    row.innerHTML = '<div class="category-tag">' + w.cat + '</div><b>' + w.en + '</b> - ' + w.pl + ' <span style="color:#B55CE6;font-size:12px;">(bledy: ' + (s.seen - s.correct) + ')</span>';
-    listCard.appendChild(row);
-  });
-  app.appendChild(listCard);
-
-  var trainBtn = document.createElement("button");
-  trainBtn.className = "action";
-  trainBtn.textContent = "Cwicz tylko te slowka (fiszki)";
-  trainBtn.onclick = function() { startFlashcards("en", true); };
-  app.appendChild(trainBtn);
-}
-
 function renderStats() {
   app.innerHTML = "";
   app.appendChild(backButton());
