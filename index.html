@@ -7,42 +7,79 @@
 <title>100 slowek EN - Trener slownictwa</title>
 <script src="words.js"></script>
 <style>
-  * { box-sizing: border-box; }
-  body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f4f5fa; margin: 0; padding: 0; color: #222; }
-  header { background: linear-gradient(135deg, #2649B2, #8E7DE3); color: white; padding: 20px; text-align: center; }
-  header h1 { margin: 0; font-size: 22px; }
-  header p { margin: 4px 0 0; opacity: 0.9; font-size: 13px; }
-  .container { max-width: 700px; margin: 0 auto; padding: 16px; }
-  .card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
-  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .menu-btn { background: #2649B2; color: white; border: none; border-radius: 12px; padding: 18px 10px; font-size: 14px; cursor: pointer; text-align: center; }
-  .menu-btn:hover { background: #4A74F3; }
-  .menu-btn.secondary { background: #9D5CE6; }
-  .menu-btn.secondary:hover { background: #B55CE6; }
-  .stats { display: flex; justify-content: space-between; font-size: 13px; color: #555; margin-bottom: 10px; }
-  .progress-bar-bg { background: #D4D9F0; border-radius: 10px; height: 10px; overflow: hidden; margin-bottom: 10px; }
-  .progress-bar-fill { background: #4A74F3; height: 100%; }
-  button.action { background: #2649B2; color: white; border: none; border-radius: 8px; padding: 12px 18px; font-size: 14px; cursor: pointer; margin: 4px; }
-  button.action:hover { background: #4A74F3; }
-  button.ghost { background: white; color: #2649B2; border: 2px solid #2649B2; }
-  button.correct { background: #2649B2; }
-  button.wrong { background: #B55CE6; }
-  input[type=text] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 15px; margin-bottom: 10px; }
-  .flashcard { background: #f4f5fa; border: 2px solid #4A74F3; border-radius: 14px; padding: 40px 20px; text-align: center; font-size: 22px; margin-bottom: 16px; min-height: 100px; display: flex; align-items: center; justify-content: center; }
-  .quiz-option { display: block; width: 100%; text-align: left; background: white; border: 2px solid #D4D9F0; border-radius: 10px; padding: 12px; margin-bottom: 8px; cursor: pointer; font-size: 14px; }
-  .quiz-option:hover { border-color: #4A74F3; }
-  .quiz-option.correct { border-color: #2649B2; background: #D4D9F0; }
-  .quiz-option.wrong { border-color: #B55CE6; background: #f5e6fb; }
-  .word-chip { display: inline-block; background: white; border: 2px solid #8E7DE3; border-radius: 8px; padding: 8px 12px; margin: 4px; cursor: pointer; font-size: 14px; }
-  .word-chip.used { opacity: 0.3; pointer-events: none; }
-  .sentence-slot { min-height: 50px; border: 2px dashed #9D5CE6; border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 15px; }
-  .feedback { font-weight: bold; margin-top: 10px; }
-  .feedback.ok { color: #2649B2; }
-  .feedback.bad { color: #B55CE6; }
-  .category-tag { display: inline-block; background: #D4D9F0; color: #2649B2; font-size: 11px; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; }
-  .back-btn { background: none; border: none; color: #2649B2; font-size: 14px; cursor: pointer; margin-bottom: 10px; padding: 0; }
-  textarea { width: 100%; min-height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; }
-  .lt-issue { background: #f5e6fb; border-left: 4px solid #B55CE6; padding: 8px 10px; margin-top: 8px; border-radius: 6px; font-size: 13px; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f4f5fa; margin: 0; padding: 0; color: #222; }
+header { background: linear-gradient(135deg, #2649B2, #8E7DE3); color: white; padding: 24px 16px; text-align: center; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 12px rgba(38,73,178,0.25); }
+header h1 { margin: 0; font-size: 20px; }
+header p { margin: 6px 0 0; opacity: 0.9; font-size: 13px; }
+.container { max-width: 700px; margin: 0 auto; padding: 16px; }
+.card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+.fade-in { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.menu-btn { background: #2649B2; color: white; border: none; border-radius: 14px; padding: 16px 10px; font-size: 14px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: transform 0.15s ease, background 0.15s ease; }
+.menu-btn:hover { background: #4A74F3; transform: translateY(-2px); }
+.menu-btn:active { transform: translateY(0); }
+.menu-icon { font-size: 22px; }
+.menu-btn.secondary { background: #9D5CE6; }
+.menu-btn.secondary:hover { background: #B55CE6; }
+.stat-card { text-align: center; }
+.stats { display: flex; justify-content: space-around; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.stat-item { display: flex; flex-direction: column; }
+.stat-num { font-size: 20px; font-weight: bold; color: #2649B2; }
+.stat-label { font-size: 11px; color: #888; }
+.due-text { font-size: 12px; color: #888; margin-top: 8px; text-align: center; }
+.progress-bar-bg { background: #D4D9F0; border-radius: 10px; height: 10px; overflow: hidden; margin-bottom: 4px; }
+.progress-bar-fill { background: linear-gradient(90deg, #2649B2, #8E7DE3); height: 100%; transition: width 0.4s ease; }
+button.action { background: #2649B2; color: white; border: none; border-radius: 10px; padding: 13px 18px; font-size: 14px; cursor: pointer; margin: 4px 4px 4px 0; transition: background 0.15s ease; }
+button.action:hover { background: #4A74F3; }
+button.action:disabled { opacity: 0.5; cursor: not-allowed; }
+button.ghost { background: white; color: #2649B2; border: 2px solid #2649B2; }
+button.correct { background: #2649B2; }
+button.wrong { background: #B55CE6; }
+input[type=text], textarea, input[type=file] { width: 100%; padding: 13px; border-radius: 10px; border: 1px solid #ddd; font-size: 15px; margin-bottom: 10px; font-family: inherit; }
+input[type=text]:focus, textarea:focus { outline: none; border-color: #4A74F3; }
+.flashcard { background: #f4f5fa; border: 2px solid #4A74F3; border-radius: 16px; padding: 36px 20px; text-align: center; font-size: 22px; margin-bottom: 14px; min-height: 90px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+.context-sentence { font-size: 13px; color: #666; min-height: 18px; text-align: center; }
+.quiz-option { display: block; width: 100%; text-align: left; background: white; border: 2px solid #D4D9F0; border-radius: 12px; padding: 13px; margin-bottom: 8px; cursor: pointer; font-size: 14px; transition: border-color 0.15s ease; }
+.quiz-option:hover { border-color: #4A74F3; }
+.quiz-option.correct { border-color: #2649B2; background: #D4D9F0; }
+.quiz-option.wrong { border-color: #B55CE6; background: #f5e6fb; }
+.word-chip { display: inline-block; background: white; border: 2px solid #8E7DE3; border-radius: 10px; padding: 9px 13px; margin: 4px; cursor: pointer; font-size: 14px; transition: opacity 0.15s ease; }
+.word-chip.used { opacity: 0.3; pointer-events: none; }
+.sentence-slot { min-height: 50px; border: 2px dashed #9D5CE6; border-radius: 10px; padding: 10px; margin-bottom: 12px; font-size: 15px; }
+.feedback { font-weight: bold; margin-top: 10px; }
+.feedback.ok { color: #2649B2; }
+.feedback.bad { color: #B55CE6; }
+.category-tag { display: inline-block; font-size: 11px; padding: 4px 10px; border-radius: 8px; margin-bottom: 10px; font-weight: 600; }
+.back-btn { background: none; border: none; color: #2649B2; font-size: 14px; cursor: pointer; margin-bottom: 12px; padding: 8px 0; font-weight: 600; }
+.lt-issue { background: #f5e6fb; border-left: 4px solid #B55CE6; padding: 8px 10px; margin-top: 8px; border-radius: 6px; font-size: 13px; }
+.score-card { padding: 14px 20px; }
+.translation-hint { font-size: 13px; color: #666; }
+.gap-sentence { font-size: 17px; line-height: 1.5; }
+.divider { margin: 20px 0; border: none; border-top: 1px solid #eee; }
+.section-title { margin-top: 0; margin-bottom: 10px; }
+.weak-row { padding: 10px 0; border-bottom: 1px solid #eee; }
+.error-count { color: #B55CE6; font-size: 12px; }
+.stat-row { margin-bottom: 12px; }
+.stat-row-label { font-size: 12px; color: #666; margin-bottom: 4px; }
+.stat-bar-bg { display: flex; height: 16px; border-radius: 8px; overflow: hidden; background: #f0f0f0; }
+.stat-bar-fill { transition: width 0.4s ease; }
+.correct-fill { background: #2649B2; }
+.wrong-fill { background: #B55CE6; }
+
+@media (max-width: 480px) {
+  header h1 { font-size: 17px; }
+  header p { font-size: 12px; }
+  .container { padding: 10px; }
+  .card { padding: 16px; border-radius: 14px; }
+  .menu-grid { grid-template-columns: 1fr; }
+  .menu-btn { flex-direction: row; justify-content: flex-start; padding: 14px; }
+  .flashcard { font-size: 19px; padding: 28px 14px; }
+  .stats { justify-content: space-between; }
+  .stat-num { font-size: 17px; }
+  button.action { width: 100%; margin: 4px 0; }
+}
 </style>
 </head>
 <body>
@@ -55,40 +92,9 @@
 <div class="container" id="app"></div>
 
 <script>
-
 var STORAGE_KEY = "word_trainer_progress_v1";
 var CUSTOM_WORDS_KEY = "word_trainer_custom_words_v1";
 var STATS_KEY = "word_trainer_stats_v1";
-
-function loadStats() {
-  var raw = localStorage.getItem(STATS_KEY);
-  return raw ? JSON.parse(raw) : {};
-}
-function saveStats(s) {
-  localStorage.setItem(STATS_KEY, JSON.stringify(s));
-}
-function logAnswer(isCorrect) {
-  var stats = loadStats();
-  var today = new Date().toISOString().slice(0,10);
-  if (!stats[today]) {
-    stats[today] = { correct: 0, wrong: 0 };
-  }
-  if (isCorrect) { stats[today].correct++; } else { stats[today].wrong++; }
-  saveStats(stats);
-}
-function getWeekStats() {
-  var stats = loadStats();
-  var days = [];
-  for (var i = 6; i >= 0; i--) {
-    var d = new Date();
-    d.setDate(d.getDate() - i);
-    var key = d.toISOString().slice(0,10);
-    var dayData = stats[key] || { correct: 0, wrong: 0 };
-    days.push({ date: key, correct: dayData.correct, wrong: dayData.wrong });
-  }
-  return days;
-}
-
 
 function loadProgress() {
   var raw = localStorage.getItem(STORAGE_KEY);
@@ -107,24 +113,46 @@ function saveCustomWords(list) {
 function getAllWords() {
   return WORDS_DATA.concat(loadCustomWords());
 }
+function loadStats() {
+  var raw = localStorage.getItem(STATS_KEY);
+  return raw ? JSON.parse(raw) : {};
+}
+function saveStats(s) {
+  localStorage.setItem(STATS_KEY, JSON.stringify(s));
+}
+function logAnswer(isCorrect) {
+  var stats = loadStats();
+  var today = new Date().toISOString().slice(0,10);
+  if (!stats[today]) { stats[today] = { correct: 0, wrong: 0 }; }
+  if (isCorrect) { stats[today].correct++; } else { stats[today].wrong++; }
+  saveStats(stats);
+}
+function getWeekStats() {
+  var stats = loadStats();
+  var days = [];
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date();
+    d.setDate(d.getDate() - i);
+    var key = d.toISOString().slice(0,10);
+    var dayData = stats[key] || { correct: 0, wrong: 0 };
+    days.push({ date: key, correct: dayData.correct, wrong: dayData.wrong });
+  }
+  return days;
+}
 
 var progress = loadProgress();
 
 function getWordState(id) {
-  if (!progress[id]) {
-    progress[id] = { level: 0, nextReview: 0, seen: 0, correct: 0 };
-  }
+  if (!progress[id]) { progress[id] = { level: 0, nextReview: 0, seen: 0, correct: 0 }; }
   return progress[id];
 }
 
 var INTERVAL_DAYS = [0, 1, 3, 7, 14, 30, 90];
 
-
 function reviewWord(id, wasCorrect) {
   logAnswer(wasCorrect);
   var state = getWordState(id);
   state.seen += 1;
-
   if (wasCorrect) {
     state.correct += 1;
     state.level = Math.min(state.level + 1, 6);
@@ -145,16 +173,6 @@ function dueWords() {
   });
 }
 
-function speak(text) {
-  if (!window.speechSynthesis) return;
-  var utter = new SpeechSynthesisUtterance(text);
-  utter.lang = "en-US";
-  utter.rate = 0.9;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utter);
-}
-
-
 function shuffle(arr) {
   var a = arr.slice();
   for (var i = a.length - 1; i > 0; i--) {
@@ -164,8 +182,6 @@ function shuffle(arr) {
   return a;
 }
 
-
-
 function hardWords() {
   return getAllWords().filter(function(w) {
     var s = getWordState(w.id);
@@ -173,13 +189,9 @@ function hardWords() {
   }).sort(function(a, b) {
     var sa = getWordState(a.id);
     var sb = getWordState(b.id);
-    var errorsA = sa.seen - sa.correct;
-    var errorsB = sb.seen - sb.correct;
-    return errorsB - errorsA;
+    return (sb.seen - sb.correct) - (sa.seen - sa.correct);
   });
 }
-
-
 
 function masteredCount() {
   return getAllWords().filter(function(w) { return getWordState(w.id).level >= 3; }).length;
@@ -191,11 +203,65 @@ function newCount() {
   return getAllWords().filter(function(w) { return getWordState(w.id).level === 0; }).length;
 }
 
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  var utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "en-US";
+  utter.rate = 0.9;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+
+function exportProgress() {
+  var payload = { progress: progress, customWords: loadCustomWords(), exportedAt: new Date().toISOString() };
+  var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "postep-slowka-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importProgress(file, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      if (data.progress) { progress = data.progress; saveProgress(progress); }
+      if (data.customWords) { saveCustomWords(data.customWords); }
+      callback(true);
+    } catch (err) { callback(false); }
+  };
+  reader.readAsText(file);
+}
+
+var CATEGORY_COLORS = {
+  "Finance & KPIs": "#2649B2",
+  "Trends & Numbers": "#4A74F3",
+  "Sales Channels & Products": "#8E7DE3",
+  "Strategy & Negotiations": "#9D5CE6",
+  "Operations & Execution": "#B55CE6",
+  "Meeting & Pitch Phrases": "#6C8BE0",
+  "Client & Stakeholder Management": "#2649B2",
+  "Quick Utility Words": "#9D5CE6",
+  "Custom": "#666"
+};
+function categoryTag(cat) {
+  var color = CATEGORY_COLORS[cat] || "#666";
+  return '<div class="category-tag" style="background:' + color + '22;color:' + color + ';">' + cat + '</div>';
+}
+
 var app = document.getElementById("app");
 
 function render(view) {
+  app.classList.remove("fade-in");
   app.innerHTML = "";
   view();
+  void app.offsetWidth;
+  app.classList.add("fade-in");
 }
 
 function backButton() {
@@ -206,7 +272,6 @@ function backButton() {
   return b;
 }
 
-
 function renderMenu() {
   var total = getAllWords().length;
   var mastered = masteredCount();
@@ -215,19 +280,16 @@ function renderMenu() {
   var due = dueWords().length;
 
   var card = document.createElement("div");
-  card.className = "card";
+  card.className = "card stat-card";
   card.innerHTML =
     '<div class="stats">' +
-      '<span>Nowe: ' + fresh + '</span>' +
-      '<span>W trakcie nauki: ' + inProgress + '</span>' +
-      '<span>Opanowane: ' + mastered + ' / ' + total + '</span>' +
+      '<div class="stat-item"><span class="stat-num">' + fresh + '</span><span class="stat-label">Nowe</span></div>' +
+      '<div class="stat-item"><span class="stat-num">' + inProgress + '</span><span class="stat-label">W trakcie</span></div>' +
+      '<div class="stat-item"><span class="stat-num">' + mastered + '/' + total + '</span><span class="stat-label">Opanowane</span></div>' +
     '</div>' +
-    '<div class="progress-bar-bg">' +
-      '<div class="progress-bar-fill" style="width:' + Math.round(mastered/total*100) + '%"></div>' +
-    '</div>' +
-    '<p style="font-size:12px;color:#888;margin-top:8px;">Do powtorki dzis: ' + due + ' slowek</p>';
+    '<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:' + Math.round(mastered/total*100) + '%"></div></div>' +
+    '<p class="due-text">Do powtorki dzis: ' + due + ' slowek</p>';
   app.appendChild(card);
-
 
   var menuCard = document.createElement("div");
   menuCard.className = "card";
@@ -237,42 +299,43 @@ function renderMenu() {
   app.appendChild(menuCard);
 
   var items = [
-    { label: "Fiszki EN -> PL", action: function(){ startFlashcards("en"); }, secondary:false },
-    { label: "Fiszki PL -> EN", action: function(){ startFlashcards("pl"); }, secondary:false },
-    { label: "Quiz wielokrotnego wyboru", action: startQuiz, secondary:false },
-    { label: "Uzupelnij luke w zdaniu", action: startGapFill, secondary:false },
-    { label: "Wpisz slowo z pamieci", action: startTyping, secondary:false },
-    { label: "Uloz zdanie", action: startSentenceBuilder, secondary:false },
-   
-  
-    { label: "Dodaj nowe slowo", action: renderAddWord, secondary:true },
-    { label: "Sprawdz zdanie (LanguageTool)", action: renderGrammarCheck, secondary:true },
-    { label: "Kopia zapasowa postepu", action: renderBackup, secondary:true },
-    { label: "Moje slabe punkty", action: renderWeakSpots, secondary:true },
-    { label: "Statystyki (7 dni)", action: renderStats, secondary:true }
+    { label: "Fiszki EN -> PL", icon: "\ud83c\udccf", action: function(){ startFlashcards("en"); } },
+    { label: "Fiszki PL -> EN", icon: "\ud83c\udccf", action: function(){ startFlashcards("pl"); } },
+    { label: "Quiz wielokrotnego wyboru", icon: "\u2753", action: startQuiz },
+    { label: "Uzupelnij luke w zdaniu", icon: "\u270f\ufe0f", action: startGapFill },
+    { label: "Wpisz slowo z pamieci", icon: "\ud83d\udd24", action: startTyping },
+    { label: "Uloz zdanie", icon: "\ud83e\udde9", action: startSentenceBuilder },
+    { label: "Dodaj nowe slowo", icon: "\u2795", action: renderAddWord, secondary:true },
+    { label: "Sprawdz zdanie", icon: "\ud83d\udee0", action: renderGrammarCheck, secondary:true },
+    { label: "Kopia zapasowa", icon: "\ud83d\udcbe", action: renderBackup, secondary:true },
+    { label: "Moje slabe punkty", icon: "\ud83c\udfaf", action: renderWeakSpots, secondary:true },
+    { label: "Statystyki (7 dni)", icon: "\ud83d\udcc8", action: renderStats, secondary:true }
   ];
-
-
   items.forEach(function(it) {
     var b = document.createElement("button");
     b.className = "menu-btn" + (it.secondary ? " secondary" : "");
-    b.textContent = it.label;
+    b.innerHTML = '<span class="menu-icon">' + it.icon + '</span><span>' + it.label + '</span>';
     b.onclick = it.action;
     grid.appendChild(b);
   });
 }
 
-
 function startFlashcards(direction, onlyHard) {
   var pool = onlyHard ? hardWords() : (dueWords().length ? dueWords() : getAllWords());
   var queue = shuffle(pool);
-
   var idx = 0;
   var showingAnswer = false;
 
   function draw() {
     app.innerHTML = "";
     app.appendChild(backButton());
+    if (queue.length === 0) {
+      var empty = document.createElement("div");
+      empty.className = "card";
+      empty.innerHTML = "<p>Brak slowek do wyswietlenia w tym trybie.</p>";
+      app.appendChild(empty);
+      return;
+    }
     if (idx >= queue.length) {
       var done = document.createElement("div");
       done.className = "card";
@@ -285,20 +348,18 @@ function startFlashcards(direction, onlyHard) {
     card.className = "card";
     var front = direction === "en" ? w.en : w.pl;
     var back = direction === "en" ? w.pl : w.en;
-    
     card.innerHTML =
-      '<div class="category-tag">' + w.cat + '</div>' +
+      categoryTag(w.cat) +
       '<div class="flashcard">' + (showingAnswer ? back : front) + '</div>' +
-      '<p style="font-size:13px;color:#666;">' + (showingAnswer ? (direction === "en" ? w.sentence_en : w.sentence_pl) : "") + '</p>' +
+      '<p class="context-sentence">' + (showingAnswer ? (direction === "en" ? w.sentence_en : w.sentence_pl) : "") + '</p>' +
       '<button class="action ghost" id="speakBtn">Odsluchaj po angielsku</button>';
     app.appendChild(card);
 
     document.getElementById("speakBtn").onclick = function() {
-      speak(w.en.replace(/\\s*\\(.*?\\)\\s*/g, "").split(" / ")[0]);
+      speak(w.en.replace(/\s*\(.*?\)\s*/g, "").split(" / ")[0]);
     };
 
     if (!showingAnswer) {
-
       var btn = document.createElement("button");
       btn.className = "action";
       btn.textContent = "Pokaz odpowiedz";
@@ -321,7 +382,6 @@ function startFlashcards(direction, onlyHard) {
   }
   draw();
 }
-
 
 function startQuiz() {
   var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
@@ -349,13 +409,13 @@ function startQuiz() {
     var options = shuffle([correctAnswer].concat(pool.map(function(p){ return askEn ? p.pl : p.en; })));
 
     var scoreCard = document.createElement("div");
-    scoreCard.className = "card";
+    scoreCard.className = "card score-card";
     scoreCard.innerHTML = '<div class="stats"><span>Pytanie ' + (idx+1) + ' / ' + queue.length + '</span><span>Poprawne: ' + correctCount + ' | Bledne: ' + wrongCount + '</span></div>';
     app.appendChild(scoreCard);
 
     var card = document.createElement("div");
     card.className = "card";
-    card.innerHTML = '<div class="category-tag">' + w.cat + '</div><h3>' + question + '</h3>';
+    card.innerHTML = categoryTag(w.cat) + "<h3>" + question + "</h3>";
     app.appendChild(card);
 
     var optsCard = document.createElement("div");
@@ -389,8 +449,6 @@ function startQuiz() {
   draw();
 }
 
-
-
 function startGapFill() {
   var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
   var idx = 0;
@@ -413,16 +471,16 @@ function startGapFill() {
     var gapped = w.sentence_en.replace(regex, "_____");
 
     var scoreCard = document.createElement("div");
-    scoreCard.className = "card";
+    scoreCard.className = "card score-card";
     scoreCard.innerHTML = '<div class="stats"><span>Pytanie ' + (idx+1) + ' / ' + queue.length + '</span><span>Poprawne: ' + correctCount + ' | Bledne: ' + wrongCount + '</span></div>';
     app.appendChild(scoreCard);
 
     var card = document.createElement("div");
     card.className = "card";
     card.innerHTML =
-      '<div class="category-tag">' + w.cat + '</div>' +
-      '<p style="font-size:13px;color:#666;">Tlumaczenie: ' + w.pl + '</p>' +
-      '<p style="font-size:17px;">' + gapped + '</p>' +
+      categoryTag(w.cat) +
+      '<p class="translation-hint">Tlumaczenie: ' + w.pl + '</p>' +
+      '<p class="gap-sentence">' + gapped + '</p>' +
       '<input type="text" id="gapInput" placeholder="Wpisz brakujace slowo po angielsku">' +
       '<button class="action" id="checkGap">Sprawdz</button>' +
       '<div id="gapFeedback"></div>';
@@ -448,8 +506,6 @@ function startGapFill() {
   draw();
 }
 
-
-
 function startTyping() {
   var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 15);
   var idx = 0;
@@ -469,15 +525,15 @@ function startTyping() {
     var w = queue[idx];
 
     var scoreCard = document.createElement("div");
-    scoreCard.className = "card";
+    scoreCard.className = "card score-card";
     scoreCard.innerHTML = '<div class="stats"><span>Pytanie ' + (idx+1) + ' / ' + queue.length + '</span><span>Poprawne: ' + correctCount + ' | Bledne: ' + wrongCount + '</span></div>';
     app.appendChild(scoreCard);
 
     var card = document.createElement("div");
     card.className = "card";
     card.innerHTML =
-      '<div class="category-tag">' + w.cat + '</div>' +
-      '<p style="font-size:13px;color:#666;">Napisz po angielsku:</p>' +
+      categoryTag(w.cat) +
+      '<p class="translation-hint">Napisz po angielsku:</p>' +
       '<h3>' + w.pl + '</h3>' +
       '<input type="text" id="typeInput" placeholder="Wpisz odpowiedz po angielsku">' +
       '<button class="action" id="checkType">Sprawdz</button>' +
@@ -505,8 +561,6 @@ function startTyping() {
   draw();
 }
 
-
-
 function startSentenceBuilder() {
   var queue = shuffle(dueWords().length ? dueWords() : getAllWords()).slice(0, 10);
   var idx = 0;
@@ -529,15 +583,15 @@ function startSentenceBuilder() {
     var built = [];
 
     var scoreCard = document.createElement("div");
-    scoreCard.className = "card";
+    scoreCard.className = "card score-card";
     scoreCard.innerHTML = '<div class="stats"><span>Zdanie ' + (idx+1) + ' / ' + queue.length + '</span><span>Poprawne: ' + correctCount + ' | Bledne: ' + wrongCount + '</span></div>';
     app.appendChild(scoreCard);
 
     var card = document.createElement("div");
     card.className = "card";
     card.innerHTML =
-      '<div class="category-tag">' + w.cat + '</div>' +
-      '<p style="font-size:13px;color:#666;">Uloz zdanie zawierajace: <b>' + w.en + '</b> (' + w.pl + ')</p>' +
+      categoryTag(w.cat) +
+      '<p class="translation-hint">Uloz zdanie zawierajace: <b>' + w.en + '</b> (' + w.pl + ')</p>' +
       '<div class="sentence-slot" id="builtSentence"></div>' +
       '<div id="chipsArea"></div>' +
       '<button class="action ghost" id="resetBtn">Wyczysc</button>' +
@@ -592,172 +646,6 @@ function startSentenceBuilder() {
   draw();
 }
 
-
-function exportProgress() {
-  var payload = {
-    progress: progress,
-    customWords: loadCustomWords(),
-    exportedAt: new Date().toISOString()
-  };
-  var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement("a");
-  a.href = url;
-  a.download = "postep-slowka-" + new Date().toISOString().slice(0,10) + ".json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function importProgress(file, callback) {
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      var data = JSON.parse(e.target.result);
-      if (data.progress) {
-        progress = data.progress;
-        saveProgress(progress);
-      }
-      if (data.customWords) {
-        saveCustomWords(data.customWords);
-      }
-      callback(true);
-    } catch (err) {
-      callback(false);
-    }
-  };
-  reader.readAsText(file);
-}
-
-
-function renderWeakSpots() {
-  app.innerHTML = "";
-  app.appendChild(backButton());
-  var weak = hardWords();
-
-  var headerCard = document.createElement("div");
-  headerCard.className = "card";
-  headerCard.innerHTML = '<h3>Twoje slabe punkty</h3><p style="font-size:13px;color:#666;">Slowka, w ktorych popelniles co najmniej jeden blad. Znaleziono: ' + weak.length + '</p>';
-  app.appendChild(headerCard);
-
-  if (weak.length === 0) {
-    var okCard = document.createElement("div");
-    okCard.className = "card";
-    okCard.innerHTML = "<p>Nie masz jeszcze zadnych slabych punktow. Pojawia sie tutaj, gdy pomylisz sie w jakims cwiczeniu.</p>";
-    app.appendChild(okCard);
-    return;
-  }
-
-  var trainBtn = document.createElement("button");
-  trainBtn.className = "action";
-  trainBtn.textContent = "Cwicz tylko te slowka (fiszki)";
-  trainBtn.style.marginBottom = "12px";
-  trainBtn.onclick = function() { startFlashcards("en", true); };
-  app.appendChild(trainBtn);
-
-  var top10 = weak.slice(0, 10);
-  var rest = weak.slice(10);
-
-  var topCard = document.createElement("div");
-  topCard.className = "card";
-  topCard.innerHTML = '<h4 style="margin-top:0;">Top 10 najtrudniejszych</h4>';
-  top10.forEach(function(w, i) {
-    var s = getWordState(w.id);
-    var row = document.createElement("div");
-    row.style.padding = "10px 0";
-    row.style.borderBottom = "1px solid #eee";
-    row.innerHTML = '<b>' + (i+1) + '. ' + w.en + '</b> - ' + w.pl + ' <span style="color:#B55CE6;font-size:12px;">(bledy: ' + (s.seen - s.correct) + ')</span> <div class="category-tag">' + w.cat + '</div>';
-    topCard.appendChild(row);
-  });
-  app.appendChild(topCard);
-
-  if (rest.length > 0) {
-    var restCard = document.createElement("div");
-    restCard.className = "card";
-    restCard.innerHTML = '<h4 style="margin-top:0;">Pozostale slowka do poprawy</h4>';
-    rest.forEach(function(w) {
-      var s = getWordState(w.id);
-      var row = document.createElement("div");
-      row.style.padding = "8px 0";
-      row.style.borderBottom = "1px solid #eee";
-      row.innerHTML = '<b>' + w.en + '</b> - ' + w.pl + ' <span style="color:#B55CE6;font-size:12px;">(bledy: ' + (s.seen - s.correct) + ')</span>';
-      restCard.appendChild(row);
-    });
-    app.appendChild(restCard);
-  }
-}
-
-function renderStats() {
-  app.innerHTML = "";
-  app.appendChild(backButton());
-  var week = getWeekStats();
-  var totalCorrect = week.reduce(function(sum, d){ return sum + d.correct; }, 0);
-  var totalWrong = week.reduce(function(sum, d){ return sum + d.wrong; }, 0);
-
-  var card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = '<h3>Statystyki z ostatnich 7 dni</h3><p style="font-size:13px;color:#666;">Poprawne: ' + totalCorrect + ' | Bledne: ' + totalWrong + '</p>';
-  app.appendChild(card);
-
-  var chartCard = document.createElement("div");
-  chartCard.className = "card";
-  var maxVal = Math.max(1, Math.max.apply(null, week.map(function(d){ return d.correct + d.wrong; })));
-  week.forEach(function(d) {
-    var total = d.correct + d.wrong;
-    var pctCorrect = total > 0 ? (d.correct / maxVal * 100) : 0;
-    var pctWrong = total > 0 ? (d.wrong / maxVal * 100) : 0;
-    var dayLabel = d.date.slice(5);
-    var row = document.createElement("div");
-    row.style.marginBottom = "12px";
-    row.innerHTML =
-      '<div style="font-size:12px;color:#666;margin-bottom:4px;">' + dayLabel + ' (' + total + ' odpowiedzi)</div>' +
-      '<div style="display:flex;height:14px;border-radius:7px;overflow:hidden;background:#f0f0f0;">' +
-        '<div style="width:' + pctCorrect + '%;background:#2649B2;"></div>' +
-        '<div style="width:' + pctWrong + '%;background:#B55CE6;"></div>' +
-      '</div>';
-    chartCard.appendChild(row);
-  });
-  app.appendChild(chartCard);
-}
-
-
-function renderBackup() {
-  app.innerHTML = "";
-  app.appendChild(backButton());
-  var card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML =
-    '<h3>Kopia zapasowa postepu</h3>' +
-    '<p style="font-size:13px;color:#666;">Pobierz plik z Twoim postepem, aby przeniesc go na inne urzadzenie lub zabezpieczyc przed utrata danych.</p>' +
-    '<button class="action" id="exportBtn">Pobierz moj postep</button>' +
-    '<hr style="margin:20px 0;border:none;border-top:1px solid #eee;">' +
-    '<p style="font-size:13px;color:#666;">Wczytaj wczesniej pobrany plik, aby przywrocic postep na tym urzadzeniu. Uwaga, to nadpisze obecny postep w tej przegladarce.</p>' +
-    '<input type="file" id="importFile" accept=".json">' +
-    '<button class="action" id="importBtn">Wczytaj postep</button>' +
-    '<div id="backupFeedback"></div>';
-  app.appendChild(card);
-
-  document.getElementById("exportBtn").onclick = exportProgress;
-
-  document.getElementById("importBtn").onclick = function() {
-    var fileInput = document.getElementById("importFile");
-    var fb = document.getElementById("backupFeedback");
-    if (!fileInput.files || !fileInput.files[0]) {
-      fb.innerHTML = "<p class='feedback bad'>Wybierz najpierw plik.</p>";
-      return;
-    }
-    importProgress(fileInput.files[0], function(success) {
-      if (success) {
-        fb.innerHTML = "<p class='feedback ok'>Postep zostal wczytany! Wroc do menu, aby zobaczyc zmiany.</p>";
-      } else {
-        fb.innerHTML = "<p class='feedback bad'>Nie udalo sie odczytac pliku. Upewnij sie, ze to plik pobrany z tego narzedzia.</p>";
-      }
-    });
-  };
-}
-
-
 function renderAddWord() {
   app.innerHTML = "";
   app.appendChild(backButton());
@@ -765,7 +653,7 @@ function renderAddWord() {
   card.className = "card";
   card.innerHTML =
     '<h3>Dodaj nowe slowo</h3>' +
-    '<p style="font-size:13px;color:#666;">Strona nie generuje zdan automatycznie. Wpisz wlasne zdanie przykladowe.</p>' +
+    '<p class="translation-hint">Strona nie generuje zdan automatycznie. Wpisz wlasne zdanie przykladowe.</p>' +
     '<input type="text" id="newEn" placeholder="Slowo/fraza po angielsku">' +
     '<input type="text" id="newPl" placeholder="Tlumaczenie po polsku">' +
     '<input type="text" id="newCat" placeholder="Kategoria (np. Finance and KPIs)">' +
@@ -799,7 +687,6 @@ function renderAddWord() {
   };
 }
 
-
 function renderGrammarCheck() {
   app.innerHTML = "";
   app.appendChild(backButton());
@@ -807,7 +694,7 @@ function renderGrammarCheck() {
   card.className = "card";
   card.innerHTML =
     '<h3>Sprawdz swoje zdanie</h3>' +
-    '<p style="font-size:13px;color:#666;">Wpisz zdanie po angielsku, a nastepnie kliknij przycisk. Otworzy sie strona LanguageTool z Twoim zdaniem gotowym do sprawdzenia. To narzedzie zewnetrzne i darmowe, ale wymaga jednego dodatkowego klikniecia z powodu ograniczen bezpieczenstwa nalozonych przez jego dostawce.</p>' +
+    '<p class="translation-hint">Wpisz zdanie po angielsku, a nastepnie kliknij przycisk. Otworzy sie strona LanguageTool z Twoim zdaniem gotowym do sprawdzenia.</p>' +
     '<textarea id="checkInput" placeholder="Np. She have finished the report yesterday."></textarea><br><br>' +
     '<button class="action" id="checkGrammarBtn">Otworz sprawdzanie w LanguageTool</button>';
   app.appendChild(card);
@@ -820,6 +707,128 @@ function renderGrammarCheck() {
   };
 }
 
+function renderBackup() {
+  app.innerHTML = "";
+  app.appendChild(backButton());
+  var card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML =
+    '<h3>Kopia zapasowa postepu</h3>' +
+    '<p class="translation-hint">Pobierz plik z Twoim postepem, aby przeniesc go na inne urzadzenie lub zabezpieczyc przed utrata danych.</p>' +
+    '<button class="action" id="exportBtn">Pobierz moj postep</button>' +
+    '<hr class="divider">' +
+    '<p class="translation-hint">Wczytaj wczesniej pobrany plik, aby przywrocic postep na tym urzadzeniu.</p>' +
+    '<input type="file" id="importFile" accept=".json">' +
+    '<button class="action" id="importBtn">Wczytaj postep</button>' +
+    '<div id="backupFeedback"></div>';
+  app.appendChild(card);
+
+  document.getElementById("exportBtn").onclick = exportProgress;
+
+  document.getElementById("importBtn").onclick = function() {
+    var fileInput = document.getElementById("importFile");
+    var fb = document.getElementById("backupFeedback");
+    if (!fileInput.files || !fileInput.files[0]) {
+      fb.innerHTML = "<p class='feedback bad'>Wybierz najpierw plik.</p>";
+      return;
+    }
+    importProgress(fileInput.files[0], function(success) {
+      if (success) {
+        fb.innerHTML = "<p class='feedback ok'>Postep zostal wczytany! Wroc do menu, aby zobaczyc zmiany.</p>";
+      } else {
+        fb.innerHTML = "<p class='feedback bad'>Nie udalo sie odczytac pliku.</p>";
+      }
+    });
+  };
+}
+
+function renderWeakSpots() {
+  app.innerHTML = "";
+  app.appendChild(backButton());
+  var weak = hardWords();
+
+  var headerCard = document.createElement("div");
+  headerCard.className = "card";
+  headerCard.innerHTML = '<h3>Twoje slabe punkty</h3><p class="translation-hint">Slowka, w ktorych popelniles co najmniej jeden blad. Znaleziono: ' + weak.length + '</p>';
+  app.appendChild(headerCard);
+
+  if (weak.length === 0) {
+    var okCard = document.createElement("div");
+    okCard.className = "card";
+    okCard.innerHTML = "<p>Nie masz jeszcze zadnych slabych punktow.</p>";
+    app.appendChild(okCard);
+    return;
+  }
+
+  var trainBtn = document.createElement("button");
+  trainBtn.className = "action";
+  trainBtn.textContent = "Cwicz tylko te slowka (fiszki)";
+  trainBtn.style.marginBottom = "12px";
+  trainBtn.onclick = function() { startFlashcards("en", true); };
+  app.appendChild(trainBtn);
+
+  var top10 = weak.slice(0, 10);
+  var rest = weak.slice(10);
+
+  var topCard = document.createElement("div");
+  topCard.className = "card";
+  topCard.innerHTML = '<h4 class="section-title">Top 10 najtrudniejszych</h4>';
+  top10.forEach(function(w, i) {
+    var s = getWordState(w.id);
+    var row = document.createElement("div");
+    row.className = "weak-row";
+    row.innerHTML = '<b>' + (i+1) + '. ' + w.en + '</b> - ' + w.pl + ' <span class="error-count">(bledy: ' + (s.seen - s.correct) + ')</span>' + categoryTag(w.cat);
+    topCard.appendChild(row);
+  });
+  app.appendChild(topCard);
+
+  if (rest.length > 0) {
+    var restCard = document.createElement("div");
+    restCard.className = "card";
+    restCard.innerHTML = '<h4 class="section-title">Pozostale slowka do poprawy</h4>';
+    rest.forEach(function(w) {
+      var s = getWordState(w.id);
+      var row = document.createElement("div");
+      row.className = "weak-row";
+      row.innerHTML = '<b>' + w.en + '</b> - ' + w.pl + ' <span class="error-count">(bledy: ' + (s.seen - s.correct) + ')</span>';
+      restCard.appendChild(row);
+    });
+    app.appendChild(restCard);
+  }
+}
+
+function renderStats() {
+  app.innerHTML = "";
+  app.appendChild(backButton());
+  var week = getWeekStats();
+  var totalCorrect = week.reduce(function(sum, d){ return sum + d.correct; }, 0);
+  var totalWrong = week.reduce(function(sum, d){ return sum + d.wrong; }, 0);
+
+  var card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = '<h3>Statystyki z ostatnich 7 dni</h3><p class="translation-hint">Poprawne: ' + totalCorrect + ' | Bledne: ' + totalWrong + '</p>';
+  app.appendChild(card);
+
+  var chartCard = document.createElement("div");
+  chartCard.className = "card";
+  var maxVal = Math.max(1, Math.max.apply(null, week.map(function(d){ return d.correct + d.wrong; })));
+  week.forEach(function(d) {
+    var total = d.correct + d.wrong;
+    var pctCorrect = total > 0 ? (d.correct / maxVal * 100) : 0;
+    var pctWrong = total > 0 ? (d.wrong / maxVal * 100) : 0;
+    var dayLabel = d.date.slice(5);
+    var row = document.createElement("div");
+    row.className = "stat-row";
+    row.innerHTML =
+      '<div class="stat-row-label">' + dayLabel + ' (' + total + ' odpowiedzi)</div>' +
+      '<div class="stat-bar-bg">' +
+        '<div class="stat-bar-fill correct-fill" style="width:' + pctCorrect + '%"></div>' +
+        '<div class="stat-bar-fill wrong-fill" style="width:' + pctWrong + '%"></div>' +
+      '</div>';
+    chartCard.appendChild(row);
+  });
+  app.appendChild(chartCard);
+}
 
 render(renderMenu);
 </script>
