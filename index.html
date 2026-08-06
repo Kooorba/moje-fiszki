@@ -68,6 +68,11 @@ input[type=text]:focus, textarea:focus { outline: none; border-color: #4A74F3; }
 .correct-fill { background: #2649B2; }
 .wrong-fill { background: #B55CE6; }
 
+.reminder-banner { background: linear-gradient(135deg, #9D5CE6, #B55CE6); color: white; text-align: center; }
+.reminder-banner p { margin: 0; font-weight: 600; }
+.reminder-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; cursor: pointer; }
+.reminder-toggle input { width: auto; margin: 0; }
+
 @media (max-width: 480px) {
   header h1 { font-size: 17px; }
   header p { font-size: 12px; }
@@ -151,6 +156,7 @@ var INTERVAL_DAYS = [0, 1, 3, 7, 14, 30, 90];
 
 function reviewWord(id, wasCorrect) {
   logAnswer(wasCorrect);
+  updateLastActivity();
   var state = getWordState(id);
   state.seen += 1;
   if (wasCorrect) {
@@ -254,6 +260,39 @@ function categoryTag(cat) {
   return '<div class="category-tag" style="background:' + color + '22;color:' + color + ';">' + cat + '</div>';
 }
 
+var REMINDER_KEY = "word_trainer_reminder_enabled_v1";
+var LAST_ACTIVITY_KEY = "word_trainer_last_activity_v1";
+
+function isReminderEnabled() {
+  var val = localStorage.getItem(REMINDER_KEY);
+  return val === null ? true : val === "true";
+}
+function setReminderEnabled(enabled) {
+  localStorage.setItem(REMINDER_KEY, enabled ? "true" : "false");
+}
+function updateLastActivity() {
+  localStorage.setItem(LAST_ACTIVITY_KEY, new Date().toISOString());
+}
+function daysSinceLastActivity() {
+  var raw = localStorage.getItem(LAST_ACTIVITY_KEY);
+  if (!raw) return null;
+  var last = new Date(raw);
+  var now = new Date();
+  var diffMs = now - last;
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+}
+function renderReminderBanner() {
+  if (!isReminderEnabled()) return null;
+  var days = daysSinceLastActivity();
+  if (days === null || days < 1) return null;
+  var banner = document.createElement("div");
+  banner.className = "card reminder-banner";
+  var msg = days === 1 ? "Nie cwiczyles wczoraj. Wroc do nauki!" : "Nie cwiczyles od " + days + " dni. Wroc do nauki!";
+  banner.innerHTML = "<p>" + msg + "</p>";
+  return banner;
+}
+
+
 var app = document.getElementById("app");
 
 function render(view) {
@@ -279,6 +318,10 @@ function renderMenu() {
   var fresh = newCount();
   var due = dueWords().length;
 
+  var reminderBanner = renderReminderBanner();
+  if (reminderBanner) { app.appendChild(reminderBanner); }
+
+
   var card = document.createElement("div");
   card.className = "card stat-card";
   card.innerHTML =
@@ -298,7 +341,10 @@ function renderMenu() {
   menuCard.appendChild(grid);
   app.appendChild(menuCard);
 
+
   var items = [
+    { label: "Sesja dnia", icon: "\ud83c\udf1f", action: startDailySession },
+    { label: "Wyzwanie 60 sekund", icon: "\u23f1", action: startChallenge },
     { label: "Fiszki EN -> PL", icon: "\ud83c\udccf", action: function(){ startFlashcards("en"); } },
     { label: "Fiszki PL -> EN", icon: "\ud83c\udccf", action: function(){ startFlashcards("pl"); } },
     { label: "Quiz wielokrotnego wyboru", icon: "\u2753", action: startQuiz },
@@ -311,6 +357,8 @@ function renderMenu() {
     { label: "Moje slabe punkty", icon: "\ud83c\udfaf", action: renderWeakSpots, secondary:true },
     { label: "Statystyki (7 dni)", icon: "\ud83d\udcc8", action: renderStats, secondary:true }
   ];
+;
+  
   items.forEach(function(it) {
     var b = document.createElement("button");
     b.className = "menu-btn" + (it.secondary ? " secondary" : "");
@@ -318,7 +366,263 @@ function renderMenu() {
     b.onclick = it.action;
     grid.appendChild(b);
   });
+
+  var settingsCard = document.createElement("div");
+  settingsCard.className = "card";
+  var reminderOn = isReminderEnabled();
+  settingsCard.innerHTML =
+    '<label class="reminder-toggle">' +
+      '<input type="checkbox" id="reminderCheckbox" ' + (reminderOn ? "checked" : "") + '>' +
+      ' Pokazuj przypomnienie o nauce' +
+    '</label>';
+  app.appendChild(settingsCard);
+  document.getElementById("reminderCheckbox").onchange = function(e) {
+    setReminderEnabled(e.target.checked);
+  };
 }
+
+
+function startDailySession() {
+  var pool = dueWords().length ? dueWords() : getAllWords();
+  var flashSet = shuffle(pool).slice(0, 5);
+  var quizSet = shuffle(pool).slice(0, 5);
+  var gapSet = shuffle(pool).slice(0, 3);
+
+  var steps = [];
+  flashSet.forEach(function(w) { steps.push({ type: "flash", word: w }); });
+  quizSet.forEach(function(w) { steps.push({ type: "quiz", word: w }); });
+  gapSet.forEach(function(w) { steps.push({ type: "gap", word: w }); });
+  steps = shuffle(steps);
+
+  var idx = 0;
+  var correctCount = 0;
+  var wrongCount = 0;
+  var showingAnswer = false;
+
+  function draw() {
+    app.innerHTML = "";
+    app.appendChild(backButton());
+    if (idx >= steps.length) {
+      var done = document.createElement("div");
+      done.className = "card";
+      done.innerHTML = "<h3>Sesja dnia zakonczona</h3><p>Wynik: " + correctCount + " poprawnych, " + wrongCount + " blednych z " + steps.length + " zadan.</p>";
+      app.appendChild(done);
+      return;
+    }
+    var scoreCard = document.createElement("div");
+    scoreCard.className = "card score-card";
+    scoreCard.innerHTML = '<div class="stats"><span>Zadanie ' + (idx+1) + ' / ' + steps.length + '</span><span>Poprawne: ' + correctCount + ' | Bledne: ' + wrongCount + '</span></div>';
+    app.appendChild(scoreCard);
+
+    var step = steps[idx];
+    var w = step.word;
+
+    if (step.type === "flash") {
+      renderFlashStep(w);
+    } else if (step.type === "quiz") {
+      renderQuizStep(w);
+    } else {
+      renderGapStep(w);
+    }
+  }
+
+  function nextStep() { idx++; showingAnswer = false; draw(); }
+
+  function renderFlashStep(w) {
+    var card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      categoryTag(w.cat) +
+      '<div class="flashcard">' + (showingAnswer ? w.pl : w.en) + '</div>' +
+      '<p class="context-sentence">' + (showingAnswer ? w.sentence_en : "") + '</p>';
+    app.appendChild(card);
+    if (!showingAnswer) {
+      var btn = document.createElement("button");
+      btn.className = "action";
+      btn.textContent = "Pokaz odpowiedz";
+      btn.onclick = function() { showingAnswer = true; draw(); };
+      app.appendChild(btn);
+    } else {
+      var btnGood = document.createElement("button");
+      btnGood.className = "action correct";
+      btnGood.textContent = "Wiedzialem";
+      btnGood.onclick = function() { reviewWord(w.id, true); correctCount++; nextStep(); };
+      var btnBad = document.createElement("button");
+      btnBad.className = "action wrong";
+      btnBad.textContent = "Nie wiedzialem";
+      btnBad.onclick = function() { reviewWord(w.id, false); wrongCount++; nextStep(); };
+      app.appendChild(btnGood);
+      app.appendChild(btnBad);
+    }
+  }
+
+  function renderQuizStep(w) {
+    var askEn = Math.random() > 0.5;
+    var question = askEn ? w.en : w.pl;
+    var correctAnswer = askEn ? w.pl : w.en;
+    var pool2 = shuffle(getAllWords().filter(function(x){ return x.id !== w.id; })).slice(0, 3);
+    var options = shuffle([correctAnswer].concat(pool2.map(function(p){ return askEn ? p.pl : p.en; })));
+
+    var card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = categoryTag(w.cat) + "<h3>" + question + "</h3>";
+    app.appendChild(card);
+
+    var optsCard = document.createElement("div");
+    optsCard.className = "card";
+    var answered = false;
+    options.forEach(function(opt) {
+      var b = document.createElement("button");
+      b.className = "quiz-option";
+      b.textContent = opt;
+      b.onclick = function() {
+        if (answered) return;
+        answered = true;
+        var isCorrect = opt === correctAnswer;
+        if (isCorrect) { correctCount++; } else { wrongCount++; }
+        b.classList.add(isCorrect ? "correct" : "wrong");
+        reviewWord(w.id, isCorrect);
+        var nextBtn = document.createElement("button");
+        nextBtn.className = "action";
+        nextBtn.textContent = "Dalej";
+        nextBtn.onclick = nextStep;
+        app.appendChild(nextBtn);
+      };
+      optsCard.appendChild(b);
+    });
+    app.appendChild(optsCard);
+  }
+
+  function renderGapStep(w) {
+    var mainWord = w.en.split(" / ")[0].replace("To ", "").split(" (")[0];
+    var regex = new RegExp(mainWord, "i");
+    var gapped = w.sentence_en.replace(regex, "_____");
+
+    var card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      categoryTag(w.cat) +
+      '<p class="translation-hint">Tlumaczenie: ' + w.pl + '</p>' +
+      '<p class="gap-sentence">' + gapped + '</p>' +
+      '<input type="text" id="dailyGapInput" placeholder="Wpisz brakujace slowo">' +
+      '<button class="action" id="dailyCheckGap">Sprawdz</button>' +
+      '<div id="dailyGapFeedback"></div>';
+    app.appendChild(card);
+
+    document.getElementById("dailyCheckGap").onclick = function() {
+      var val = document.getElementById("dailyGapInput").value.trim().toLowerCase();
+      var isCorrect = mainWord.toLowerCase().indexOf(val) !== -1 || val.indexOf(mainWord.toLowerCase()) !== -1;
+      if (isCorrect) { correctCount++; } else { wrongCount++; }
+      reviewWord(w.id, isCorrect);
+      document.getElementById("dailyCheckGap").disabled = true;
+      document.getElementById("dailyGapInput").disabled = true;
+      var fb = document.getElementById("dailyGapFeedback");
+      fb.className = "feedback " + (isCorrect ? "ok" : "bad");
+      fb.textContent = isCorrect ? "Dobrze!" : ("Poprawna odpowiedz: " + mainWord);
+      var nextBtn = document.createElement("button");
+      nextBtn.className = "action";
+      nextBtn.textContent = "Dalej";
+      nextBtn.onclick = nextStep;
+      app.appendChild(nextBtn);
+    };
+  }
+
+  draw();
+}
+
+function startChallenge() {
+  var pool = getAllWords();
+  var timeLeft = 60;
+  var correctCount = 0;
+  var wrongCount = 0;
+  var timerInterval = null;
+  var currentWord = null;
+  var currentCorrectAnswer = null;
+
+  function pickNewQuestion() {
+    var w = pool[Math.floor(Math.random() * pool.length)];
+    var askEn = Math.random() > 0.5;
+    currentWord = w;
+    currentCorrectAnswer = askEn ? w.pl : w.en;
+    var question = askEn ? w.en : w.pl;
+    var otherPool = shuffle(pool.filter(function(x){ return x.id !== w.id; })).slice(0, 3);
+    var options = shuffle([currentCorrectAnswer].concat(otherPool.map(function(p){ return askEn ? p.pl : p.en; })));
+    return { question: question, options: options };
+  }
+
+  function drawQuestion() {
+    var q = pickNewQuestion();
+    var qCard = document.getElementById("challengeQuestionArea");
+    qCard.innerHTML = "<h3>" + q.question + "</h3>";
+    var optsArea = document.getElementById("challengeOptionsArea");
+    optsArea.innerHTML = "";
+    q.options.forEach(function(opt) {
+      var b = document.createElement("button");
+      b.className = "quiz-option";
+      b.textContent = opt;
+      b.onclick = function() {
+        var isCorrect = opt === currentCorrectAnswer;
+        if (isCorrect) { correctCount++; } else { wrongCount++; }
+        reviewWord(currentWord.id, isCorrect);
+        document.getElementById("challengeScoreArea").textContent = "Poprawne: " + correctCount + " | Bledne: " + wrongCount;
+        drawQuestion();
+      };
+      optsArea.appendChild(b);
+    });
+  }
+
+  function endChallenge() {
+    clearInterval(timerInterval);
+    app.innerHTML = "";
+    app.appendChild(backButton());
+    var done = document.createElement("div");
+    done.className = "card";
+    done.innerHTML = "<h3>Koniec wyzwania</h3><p>Poprawne odpowiedzi: " + correctCount + "</p><p>Bledne odpowiedzi: " + wrongCount + "</p>";
+    app.appendChild(done);
+    var retryBtn = document.createElement("button");
+    retryBtn.className = "action";
+    retryBtn.textContent = "Sprobuj ponownie";
+    retryBtn.onclick = startChallenge;
+    app.appendChild(retryBtn);
+  }
+
+  app.innerHTML = "";
+  app.appendChild(backButton());
+
+  var introCard = document.createElement("div");
+  introCard.className = "card";
+  introCard.innerHTML = "<h3>Wyzwanie 60 sekund</h3><p class='translation-hint'>Odpowiedz poprawnie na jak najwiecej pytan w 60 sekund.</p><button class='action' id='startChallengeBtn'>Start</button>";
+  app.appendChild(introCard);
+
+  document.getElementById("startChallengeBtn").onclick = function() {
+    app.innerHTML = "";
+    app.appendChild(backButton());
+
+    var timerCard = document.createElement("div");
+    timerCard.className = "card score-card";
+    timerCard.innerHTML = '<div class="stats"><span id="challengeTimer">Czas: 60s</span><span id="challengeScoreArea">Poprawne: 0 | Bledne: 0</span></div>';
+    app.appendChild(timerCard);
+
+    var qCard = document.createElement("div");
+    qCard.className = "card";
+    qCard.id = "challengeQuestionArea";
+    app.appendChild(qCard);
+
+    var optsCard = document.createElement("div");
+    optsCard.className = "card";
+    optsCard.id = "challengeOptionsArea";
+    app.appendChild(optsCard);
+
+    drawQuestion();
+
+    timerInterval = setInterval(function() {
+      timeLeft--;
+      document.getElementById("challengeTimer").textContent = "Czas: " + timeLeft + "s";
+      if (timeLeft <= 0) { endChallenge(); }
+    }, 1000);
+  };
+}
+
 
 function startFlashcards(direction, onlyHard) {
   var pool = onlyHard ? hardWords() : (dueWords().length ? dueWords() : getAllWords());
