@@ -6,6 +6,69 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>100 slowek EN - Trener slownictwa</title>
 <script src="words.js"></script>
+  
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDUOJ9njsdpIGNM39xVojy_z0f4KeH_X6g",
+    authDomain: "fiszki-ea26f.firebaseapp.com",
+    projectId: "fiszki-ea26f",
+    storageBucket: "fiszki-ea26f.firebasestorage.app",
+    messagingSenderId: "552049727665",
+    appId: "1:552049727665:web:3cc94be33de561f4422a90"
+  };
+
+  const ADMIN_EMAIL = "pawelkorbecki88@gmail.com";
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  const auth = getAuth(firebaseApp);
+  const db = getFirestore(firebaseApp);
+
+  window.appLoginWithGoogle = async function() {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      alert("Blad logowania: " + e.message);
+    }
+  };
+
+  window.appLogout = async function() {
+    await signOut(auth);
+    window.location.reload();
+  };
+
+  onAuthStateChanged(auth, async function(user) {
+    if (!user) {
+      window.currentUser = null;
+      if (window.onAuthReady) window.onAuthReady(null);
+      return;
+    }
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) {
+      const isAdmin = user.email === ADMIN_EMAIL;
+      const newUserData = {
+        email: user.email,
+        status: isAdmin ? "approved" : "pending",
+        isAdmin: isAdmin,
+        progress: {},
+        customWords: [],
+        createdAt: new Date().toISOString()
+      };
+      await setDoc(userRef, newUserData);
+      window.currentUser = { uid: user.uid, ...newUserData };
+    } else {
+      window.currentUser = { uid: user.uid, ...snap.data() };
+    }
+    if (window.onAuthReady) window.onAuthReady(window.currentUser);
+  });
+</script>
+
 <style>
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f4f5fa; margin: 0; padding: 0; color: #222; }
