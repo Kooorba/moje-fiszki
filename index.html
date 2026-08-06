@@ -55,8 +55,40 @@
 <div class="container" id="app"></div>
 
 <script>
+
 var STORAGE_KEY = "word_trainer_progress_v1";
 var CUSTOM_WORDS_KEY = "word_trainer_custom_words_v1";
+var STATS_KEY = "word_trainer_stats_v1";
+
+function loadStats() {
+  var raw = localStorage.getItem(STATS_KEY);
+  return raw ? JSON.parse(raw) : {};
+}
+function saveStats(s) {
+  localStorage.setItem(STATS_KEY, JSON.stringify(s));
+}
+function logAnswer(isCorrect) {
+  var stats = loadStats();
+  var today = new Date().toISOString().slice(0,10);
+  if (!stats[today]) {
+    stats[today] = { correct: 0, wrong: 0 };
+  }
+  if (isCorrect) { stats[today].correct++; } else { stats[today].wrong++; }
+  saveStats(stats);
+}
+function getWeekStats() {
+  var stats = loadStats();
+  var days = [];
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date();
+    d.setDate(d.getDate() - i);
+    var key = d.toISOString().slice(0,10);
+    var dayData = stats[key] || { correct: 0, wrong: 0 };
+    days.push({ date: key, correct: dayData.correct, wrong: dayData.wrong });
+  }
+  return days;
+}
+
 
 function loadProgress() {
   var raw = localStorage.getItem(STORAGE_KEY);
@@ -87,9 +119,12 @@ function getWordState(id) {
 
 var INTERVAL_DAYS = [0, 1, 3, 7, 14, 30, 90];
 
+
 function reviewWord(id, wasCorrect) {
+  logAnswer(wasCorrect);
   var state = getWordState(id);
   state.seen += 1;
+
   if (wasCorrect) {
     state.correct += 1;
     state.level = Math.min(state.level + 1, 6);
@@ -127,6 +162,14 @@ function shuffle(arr) {
     var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
   }
   return a;
+}
+
+
+function hardWords() {
+  return getAllWords().filter(function(w) {
+    var s = getWordState(w.id);
+    return s.level <= 1;
+  });
 }
 
 
@@ -193,10 +236,14 @@ function renderMenu() {
     { label: "Wpisz slowo z pamieci", action: startTyping, secondary:false },
     { label: "Uloz zdanie", action: startSentenceBuilder, secondary:false },
    
+  
     { label: "Dodaj nowe slowo", action: renderAddWord, secondary:true },
     { label: "Sprawdz zdanie (LanguageTool)", action: renderGrammarCheck, secondary:true },
-    { label: "Kopia zapasowa postepu", action: renderBackup, secondary:true }
+    { label: "Kopia zapasowa postepu", action: renderBackup, secondary:true },
+    { label: "Moje slabe punkty", action: renderWeakSpots, secondary:true },
+    { label: "Statystyki (7 dni)", action: renderStats, secondary:true }
   ];
+
 
   items.forEach(function(it) {
     var b = document.createElement("button");
@@ -207,8 +254,11 @@ function renderMenu() {
   });
 }
 
-function startFlashcards(direction) {
-  var queue = shuffle(dueWords().length ? dueWords() : getAllWords());
+
+function startFlashcards(direction, onlyHard) {
+  var pool = onlyHard ? hardWords() : (dueWords().length ? dueWords() : getAllWords());
+  var queue = shuffle(pool);
+
   var idx = 0;
   var showingAnswer = false;
 
@@ -571,6 +621,77 @@ function importProgress(file, callback) {
   };
   reader.readAsText(file);
 }
+
+function renderWeakSpots() {
+  app.innerHTML = "";
+  app.appendChild(backButton());
+  var weak = hardWords();
+
+  var card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = '<h3>Twoje slabe punkty</h3><p style="font-size:13px;color:#666;">Slowka, ktore najczesciej sprawiaja Ci trudnosc (poziom 0-1). Znaleziono: ' + weak.length + '</p>';
+  app.appendChild(card);
+
+  if (weak.length === 0) {
+    var okCard = document.createElement("div");
+    okCard.className = "card";
+    okCard.innerHTML = "<p>Brawo, nie masz obecnie zadnych slabych punktow! Wroc do menu i kontynuuj nauke.</p>";
+    app.appendChild(okCard);
+    return;
+  }
+
+  var listCard = document.createElement("div");
+  listCard.className = "card";
+  weak.forEach(function(w) {
+    var s = getWordState(w.id);
+    var row = document.createElement("div");
+    row.style.padding = "10px 0";
+    row.style.borderBottom = "1px solid #eee";
+    row.innerHTML = '<div class="category-tag">' + w.cat + '</div><b>' + w.en + '</b> - ' + w.pl + ' <span style="color:#B55CE6;font-size:12px;">(bledy: ' + (s.seen - s.correct) + ')</span>';
+    listCard.appendChild(row);
+  });
+  app.appendChild(listCard);
+
+  var trainBtn = document.createElement("button");
+  trainBtn.className = "action";
+  trainBtn.textContent = "Cwicz tylko te slowka (fiszki)";
+  trainBtn.onclick = function() { startFlashcards("en", true); };
+  app.appendChild(trainBtn);
+}
+
+function renderStats() {
+  app.innerHTML = "";
+  app.appendChild(backButton());
+  var week = getWeekStats();
+  var totalCorrect = week.reduce(function(sum, d){ return sum + d.correct; }, 0);
+  var totalWrong = week.reduce(function(sum, d){ return sum + d.wrong; }, 0);
+
+  var card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = '<h3>Statystyki z ostatnich 7 dni</h3><p style="font-size:13px;color:#666;">Poprawne: ' + totalCorrect + ' | Bledne: ' + totalWrong + '</p>';
+  app.appendChild(card);
+
+  var chartCard = document.createElement("div");
+  chartCard.className = "card";
+  var maxVal = Math.max(1, Math.max.apply(null, week.map(function(d){ return d.correct + d.wrong; })));
+  week.forEach(function(d) {
+    var total = d.correct + d.wrong;
+    var pctCorrect = total > 0 ? (d.correct / maxVal * 100) : 0;
+    var pctWrong = total > 0 ? (d.wrong / maxVal * 100) : 0;
+    var dayLabel = d.date.slice(5);
+    var row = document.createElement("div");
+    row.style.marginBottom = "12px";
+    row.innerHTML =
+      '<div style="font-size:12px;color:#666;margin-bottom:4px;">' + dayLabel + ' (' + total + ' odpowiedzi)</div>' +
+      '<div style="display:flex;height:14px;border-radius:7px;overflow:hidden;background:#f0f0f0;">' +
+        '<div style="width:' + pctCorrect + '%;background:#2649B2;"></div>' +
+        '<div style="width:' + pctWrong + '%;background:#B55CE6;"></div>' +
+      '</div>';
+    chartCard.appendChild(row);
+  });
+  app.appendChild(chartCard);
+}
+
 
 function renderBackup() {
   app.innerHTML = "";
