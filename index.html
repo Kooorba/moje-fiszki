@@ -74,11 +74,16 @@
 body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f4f5fa; margin: 0; padding: 0; color: #222; }
 
 header { background: linear-gradient(135deg, #2649B2, #8E7DE3); color: white; padding: 14px 16px; text-align: left; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 12px rgba(38,73,178,0.25); }
-.header-inner { max-width: 700px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-.header-titles { flex: 1; min-width: 180px; }
-header h1 { margin: 0; font-size: 17px; line-height: 1.3; }
+
+.header-inner { max-width: 700px; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; min-height: 40px; }
+.header-titles { text-align: center; padding: 0 70px; }
+header h1 { margin: 0; font-size: 19px; line-height: 1.3; }
+.header-auth-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+
 header p { margin: 3px 0 0; opacity: 0.85; font-size: 11px; }
-.header-auth-btn { background: rgba(255,255,255,0.22); color: white; border: 1.5px solid rgba(255,255,255,0.55); border-radius: 20px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: background 0.15s ease; white-space: nowrap; }
+
+.header-auth-btn { background: rgba(255,255,255,0.22); color: white; border: 1.5px solid rgba(255,255,255,0.55); border-radius: 20px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: background 0.15s ease; }
+
 .header-auth-btn:hover { background: rgba(255,255,255,0.4); }
 .header-auth-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
 
@@ -412,42 +417,36 @@ function renderHeaderAuthButton() {
 }
 
 
+
 function renderAuthPanel() {
- var card = document.createElement("div");
- card.className = "card";
  var user = window.currentUser;
  if (!user) {
+ var card = document.createElement("div");
+ card.className = "card";
  card.innerHTML =
- '<p style="font-size:13px;color:#666;margin-top:0;">Mozesz uzywac strony bez logowania - Twoj postep zapisze sie tylko w tej przegladarce. Zaloguj sie, aby zsynchronizowac postep z innymi urzadzeniami.</p>' +
- '<button class="action" id="loginBtn">Zaloguj sie przez Google</button>';
- } else if (user.status === "pending") {
- card.innerHTML =
- '<p style="font-size:13px;color:#666;margin-top:0;">Zalogowano jako ' + user.email + '</p>' +
- '<p class="feedback bad">Twoje konto oczekuje na zatwierdzenie przez administratora. W miedzyczasie mozesz korzystac ze strony normalnie - Twoj postep zapisuje sie lokalnie.</p>' +
- '<button class="action ghost" id="logoutBtn">Wyloguj</button>';
- } else {
- card.innerHTML =
- '<p style="font-size:13px;color:#666;margin-top:0;">Zalogowano jako ' + user.email + (user.isAdmin ? " (administrator)" : "") + '</p>' +
- '<button class="action ghost" id="logoutBtn">Wyloguj</button>';
- }
+ '<p style="font-size:13px;color:#666;margin-top:0;">Mozesz uzywac strony bez logowania - Twoj postep zapisze sie tylko w tej przegladarce. Zaloguj sie przez ikone w prawym gornym rogu, aby zsynchronizowac postep z innymi urzadzeniami.</p>';
  return card;
+ }
+ if (user.status === "pending") {
+ var card2 = document.createElement("div");
+ card2.className = "card";
+ card2.innerHTML =
+ '<p style="font-size:13px;color:#666;margin-top:0;">Zalogowano jako ' + user.email + '</p>' +
+ '<p class="feedback bad">Twoje konto oczekuje na zatwierdzenie przez administratora. W miedzyczasie mozesz korzystac ze strony normalnie - Twoj postep zapisuje sie lokalnie.</p>';
+ return card2;
+ }
+ return null;
 }
+
+
 
 
 
 function renderMenu() {
  renderHeaderAuthButton();
  var authPanel = renderAuthPanel();
- app.appendChild(authPanel);
+ if (authPanel) { app.appendChild(authPanel); }
 
- var user = window.currentUser;
- if (!user) {
- var loginBtn = document.getElementById("loginBtn");
- if (loginBtn) loginBtn.onclick = function() { window.appLoginWithGoogle(); };
- } else {
- var logoutBtn = document.getElementById("logoutBtn");
- if (logoutBtn) logoutBtn.onclick = function() { window.appLogout(); };
- }
 
  var total = getAllWords().length;
  var mastered = masteredCount();
