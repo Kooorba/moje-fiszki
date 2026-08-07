@@ -72,12 +72,16 @@
 <style>
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f4f5fa; margin: 0; padding: 0; color: #222; }
-h
-header { background: linear-gradient(135deg, #2649B2, #8E7DE3); color: white; padding: 24px 16px; text-align: center; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 12px rgba(38,73,178,0.25); position: relative; }
-.header-auth-btn { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; padding: 7px 14px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.15s ease; }
-.header-auth-btn:hover { background: rgba(255,255,255,0.35); }
 
-header p { margin: 6px 0 0; opacity: 0.9; font-size: 13px; }
+header { background: linear-gradient(135deg, #2649B2, #8E7DE3); color: white; padding: 14px 16px; text-align: left; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 12px rgba(38,73,178,0.25); }
+.header-inner { max-width: 700px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.header-titles { flex: 1; min-width: 180px; }
+header h1 { margin: 0; font-size: 17px; line-height: 1.3; }
+header p { margin: 3px 0 0; opacity: 0.85; font-size: 11px; }
+.header-auth-btn { background: rgba(255,255,255,0.22); color: white; border: 1.5px solid rgba(255,255,255,0.55); border-radius: 20px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: background 0.15s ease; white-space: nowrap; }
+.header-auth-btn:hover { background: rgba(255,255,255,0.4); }
+.header-auth-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
 .container { max-width: 700px; margin: 0 auto; padding: 16px; }
 .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
 .fade-in { animation: fadeIn 0.25s ease; }
@@ -156,11 +160,17 @@ input[type=text]:focus, textarea:focus { outline: none; border-color: #4A74F3; }
 <body>
 
 
+
 <header>
- <div id="headerAuthArea"></div>
+ <div class="header-inner">
+ <div class="header-titles">
  <h1>Trener 100 slowek biznesowego angielskiego</h1>
  <p>Ucz sie, powtarzaj, sprawdzaj swoje postepy</p>
+ </div>
+ <div id="headerAuthArea"></div>
+ </div>
 </header>
+
 
 
 <div class="container" id="app"></div>
@@ -380,6 +390,9 @@ function backButton() {
   return b;
 }
 
+
+var USER_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" fill="white"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
+
 function renderHeaderAuthButton() {
  var area = document.getElementById("headerAuthArea");
  if (!area) return;
@@ -387,16 +400,17 @@ function renderHeaderAuthButton() {
  var btn = document.createElement("button");
  btn.className = "header-auth-btn";
  if (!user) {
- btn.innerHTML = '<span>&#128100;</span><span>Zaloguj sie</span>';
+ btn.innerHTML = USER_ICON_SVG + '<span>Zaloguj</span>';
  btn.onclick = function() { window.appLoginWithGoogle(); };
  } else {
- var shortEmail = user.email.split("@")[0];
- btn.innerHTML = '<span>&#128100;</span><span>' + shortEmail + '</span>';
+ btn.innerHTML = USER_ICON_SVG + '<span>Wyloguj</span>';
+ btn.title = user.email;
  btn.onclick = function() { window.appLogout(); };
  }
  area.innerHTML = "";
  area.appendChild(btn);
 }
+
 
 function renderAuthPanel() {
  var card = document.createElement("div");
