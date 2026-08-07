@@ -374,9 +374,43 @@ function backButton() {
   return b;
 }
 
+function renderAuthPanel() {
+ var card = document.createElement("div");
+ card.className = "card";
+ var user = window.currentUser;
+ if (!user) {
+ card.innerHTML =
+ '<p style="font-size:13px;color:#666;margin-top:0;">Mozesz uzywac strony bez logowania - Twoj postep zapisze sie tylko w tej przegladarce. Zaloguj sie, aby zsynchronizowac postep z innymi urzadzeniami.</p>' +
+ '<button class="action" id="loginBtn">Zaloguj sie przez Google</button>';
+ } else if (user.status === "pending") {
+ card.innerHTML =
+ '<p style="font-size:13px;color:#666;margin-top:0;">Zalogowano jako ' + user.email + '</p>' +
+ '<p class="feedback bad">Twoje konto oczekuje na zatwierdzenie przez administratora. W miedzyczasie mozesz korzystac ze strony normalnie - Twoj postep zapisuje sie lokalnie.</p>' +
+ '<button class="action ghost" id="logoutBtn">Wyloguj</button>';
+ } else {
+ card.innerHTML =
+ '<p style="font-size:13px;color:#666;margin-top:0;">Zalogowano jako ' + user.email + (user.isAdmin ? " (administrator)" : "") + '</p>' +
+ '<button class="action ghost" id="logoutBtn">Wyloguj</button>';
+ }
+ return card;
+}
+
+
 function renderMenu() {
-  var total = getAllWords().length;
-  var mastered = masteredCount();
+ var authPanel = renderAuthPanel();
+ app.appendChild(authPanel);
+ var user = window.currentUser;
+ if (!user) {
+ var loginBtn = document.getElementById("loginBtn");
+ if (loginBtn) loginBtn.onclick = function() { window.appLoginWithGoogle(); };
+ } else {
+ var logoutBtn = document.getElementById("logoutBtn");
+ if (logoutBtn) logoutBtn.onclick = function() { window.appLogout(); };
+ }
+
+ var total = getAllWords().length;
+ var mastered = masteredCount();
+
   var inProgress = inProgressCount();
   var fresh = newCount();
   var due = dueWords().length;
@@ -1197,7 +1231,16 @@ function renderStats() {
   app.appendChild(chartCard);
 }
 
-render(renderMenu);
+
+window.onAuthReady = function(user) {
+ render(renderMenu);
+};
+if (window.currentUser !== undefined) {
+ render(renderMenu);
+} else {
+ render(renderMenu);
+}
 </script>
 </body>
 </html>
+
