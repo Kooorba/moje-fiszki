@@ -646,9 +646,11 @@ function startDailySession() {
       '<div id="dailyGapFeedback"></div>';
     app.appendChild(card);
 
-    document.getElementById("dailyCheckGap").onclick = function() {
-      var val = document.getElementById("dailyGapInput").value.trim().toLowerCase();
-      var isCorrect = mainWord.toLowerCase().indexOf(val) !== -1 || val.indexOf(mainWord.toLowerCase()) !== -1;
+
+document.getElementById("dailyCheckGap").onclick = function() {
+ var val = document.getElementById("dailyGapInput").value.trim().toLowerCase();
+ var isCorrect = val.length > 0 && (mainWord.toLowerCase().indexOf(val) !== -1 || val.indexOf(mainWord.toLowerCase()) !== -1);
+
       if (isCorrect) { correctCount++; } else { wrongCount++; }
       reviewWord(w.id, isCorrect);
       document.getElementById("dailyCheckGap").disabled = true;
@@ -927,9 +929,10 @@ function startGapFill() {
       '<div id="gapFeedback"></div>';
     app.appendChild(card);
 
-    document.getElementById("checkGap").onclick = function() {
-      var val = document.getElementById("gapInput").value.trim().toLowerCase();
-      var isCorrect = mainWord.toLowerCase().indexOf(val) !== -1 || val.indexOf(mainWord.toLowerCase()) !== -1;
+document.getElementById("checkGap").onclick = function() {
+ var val = document.getElementById("gapInput").value.trim().toLowerCase();
+ var isCorrect = val.length > 0 && (mainWord.toLowerCase().indexOf(val) !== -1 || val.indexOf(mainWord.toLowerCase()) !== -1);
+
       if (isCorrect) { correctCount++; } else { wrongCount++; }
       reviewWord(w.id, isCorrect);
       document.getElementById("checkGap").disabled = true;
@@ -981,10 +984,12 @@ function startTyping() {
       '<div id="typeFeedback"></div>';
     app.appendChild(card);
 
-    document.getElementById("checkType").onclick = function() {
-      var val = document.getElementById("typeInput").value.trim().toLowerCase();
-      var correctVal = w.en.toLowerCase();
-      var isCorrect = (val === correctVal) || (correctVal.indexOf(val) !== -1 && val.length > 3);
+ 
+document.getElementById("checkType").onclick = function() {
+ var val = document.getElementById("typeInput").value.trim().toLowerCase();
+ var correctVal = w.en.toLowerCase();
+ var isCorrect = val.length > 0 && ((val === correctVal) || (correctVal.indexOf(val) !== -1 && val.length > 3));
+
       if (isCorrect) { correctCount++; } else { wrongCount++; }
       reviewWord(w.id, isCorrect);
       document.getElementById("checkType").disabled = true;
