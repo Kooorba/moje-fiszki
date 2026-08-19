@@ -755,13 +755,22 @@ function startChallenge() {
       var b = document.createElement("button");
       b.className = "quiz-option";
       b.textContent = opt;
-      b.onclick = function() {
-        var isCorrect = opt === currentCorrectAnswer;
-        if (isCorrect) { correctCount++; } else { wrongCount++; }
-        reviewWord(currentWord.id, isCorrect);
-        document.getElementById("challengeScoreArea").textContent = "Poprawne: " + correctCount + " | Bledne: " + wrongCount;
-        drawQuestion();
-      };
+      
+  b.onclick = function() {
+    var isCorrect = opt === currentCorrectAnswer;
+    b.classList.add(isCorrect ? "correct" : "wrong");
+    if (isCorrect) { correctCount++; } else { wrongCount++; }
+    reviewWord(currentWord.id, isCorrect);
+    document.getElementById("challengeScoreArea").textContent = "Poprawne: " + correctCount + " | Bledne: " + wrongCount;
+    if (!isCorrect) {
+      Array.prototype.forEach.call(optsArea.children, function(c) {
+        if (c.textContent === currentCorrectAnswer) c.classList.add("correct");
+      });
+    }
+    Array.prototype.forEach.call(optsArea.children, function(c) { c.disabled = true; });
+    setTimeout(drawQuestion, isCorrect ? 300 : 900);
+  };
+
       optsArea.appendChild(b);
     });
   }
