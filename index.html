@@ -282,10 +282,12 @@ function getWeekStats() {
 
 var progress = loadProgress();
 
+
 function getWordState(id) {
-  if (!progress[id]) { progress[id] = { level: 0, nextReview: 0, seen: 0, correct: 0 }; }
-  return progress[id];
+ if (!progress[id]) { return { level: 0, nextReview: 0, seen: 0, correct: 0 }; }
+ return progress[id];
 }
+
 
 var INTERVAL_DAYS = [0, 1, 3, 7, 14, 30, 90];
 
