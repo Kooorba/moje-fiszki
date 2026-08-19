@@ -674,6 +674,13 @@ function startDailySession() {
         var isCorrect = opt === correctAnswer;
         if (isCorrect) { correctCount++; } else { wrongCount++; }
         b.classList.add(isCorrect ? "correct" : "wrong");
+        
+        if (!isCorrect) {
+          Array.prototype.forEach.call(optsCard.children, function(c) {
+            if (c.textContent === correctAnswer) c.classList.add("correct");
+          });
+        }
+
         reviewWord(w.id, isCorrect);
         var nextBtn = document.createElement("button");
         nextBtn.className = "action";
