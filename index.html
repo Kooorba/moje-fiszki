@@ -710,9 +710,11 @@ function startDailySession() {
     app.appendChild(card);
 
 
+
 document.getElementById("dailyCheckGap").onclick = function() {
  var val = document.getElementById("dailyGapInput").value.trim().toLowerCase();
- var isCorrect = val.length > 0 && (mainWord.toLowerCase().indexOf(val) !== -1 || val.indexOf(mainWord.toLowerCase()) !== -1);
+ var isCorrect = val.length > 0 && val === mainWord.toLowerCase();
+
 
       if (isCorrect) { correctCount++; } else { wrongCount++; }
       reviewWord(w.id, isCorrect);
@@ -1001,9 +1003,11 @@ function startGapFill() {
       '<div id="gapFeedback"></div>';
     app.appendChild(card);
 
+
 document.getElementById("checkGap").onclick = function() {
  var val = document.getElementById("gapInput").value.trim().toLowerCase();
- var isCorrect = val.length > 0 && (mainWord.toLowerCase().indexOf(val) !== -1 || val.indexOf(mainWord.toLowerCase()) !== -1);
+ var isCorrect = val.length > 0 && val === mainWord.toLowerCase();
+
 
       if (isCorrect) { correctCount++; } else { wrongCount++; }
       reviewWord(w.id, isCorrect);
