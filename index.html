@@ -41,6 +41,31 @@
     window.location.reload();
   };
 
+window.syncProgressToCloud = async function(progressObj, customWordsArr) {
+ if (!window.currentUser || window.currentUser.status !== "approved") return;
+ try {
+ const userRef = doc(db, "users", window.currentUser.uid);
+ await setDoc(userRef, { progress: progressObj, customWords: customWordsArr }, { merge: true });
+ } catch (e) {
+ console.log("Sync error: " + e.message);
+ }
+};
+
+function mergeProgress(localProgress, cloudProgress) {
+ var merged = {};
+ var allIds = {};
+ for (var id in localProgress) { allIds[id] = true; }
+ for (var id2 in cloudProgress) { allIds[id2] = true; }
+ for (var id3 in allIds) {
+ var local = localProgress[id3];
+ var cloud = cloudProgress[id3];
+ if (!local) { merged[id3] = cloud; }
+ else if (!cloud) { merged[id3] = local; }
+ else { merged[id3] = (local.level >= cloud.level) ? local : cloud; }
+ }
+ return merged;
+}
+
   onAuthStateChanged(auth, async function(user) {
     if (!user) {
       window.currentUser = null;
@@ -50,23 +75,49 @@
     const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
 
-    if (!snap.exists()) {
-      const isAdmin = user.email === ADMIN_EMAIL;
-      const newUserData = {
-        email: user.email,
-        status: isAdmin ? "approved" : "pending",
-        isAdmin: isAdmin,
-        progress: {},
-        customWords: [],
-        createdAt: new Date().toISOString()
-      };
-      await setDoc(userRef, newUserData);
-      window.currentUser = { uid: user.uid, ...newUserData };
-    } else {
-      window.currentUser = { uid: user.uid, ...snap.data() };
-    }
-    if (window.onAuthReady) window.onAuthReady(window.currentUser);
-  });
+   
+if (!snap.exists()) {
+ const isAdmin = user.email === ADMIN_EMAIL;
+ const localProgressRaw = localStorage.getItem("word_trainer_progress_v1");
+ const localCustomRaw = localStorage.getItem("word_trainer_custom_words_v1");
+ const localProgress = localProgressRaw ? JSON.parse(localProgressRaw) : {};
+ const localCustom = localCustomRaw ? JSON.parse(localCustomRaw) : [];
+ const newUserData = {
+ email: user.email,
+ status: isAdmin ? "approved" : "pending",
+ isAdmin: isAdmin,
+ progress: localProgress,
+ customWords: localCustom,
+ createdAt: new Date().toISOString()
+ };
+ await setDoc(userRef, newUserData);
+ window.currentUser = { uid: user.uid, ...newUserData };
+ } else {
+ const cloudData = snap.data();
+ if (cloudData.status === "approved") {
+ const localProgressRaw = localStorage.getItem("word_trainer_progress_v1");
+ const localCustomRaw = localStorage.getItem("word_trainer_custom_words_v1");
+ const localProgress = localProgressRaw ? JSON.parse(localProgressRaw) : {};
+ const localCustom = localCustomRaw ? JSON.parse(localCustomRaw) : [];
+ const cloudProgress = cloudData.progress || {};
+ const cloudCustom = cloudData.customWords || [];
+ const mergedProgress = mergeProgress(localProgress, cloudProgress);
+ const mergedCustomIds = {};
+ const mergedCustom = [];
+ cloudCustom.concat(localCustom).forEach(function(w) {
+ if (!mergedCustomIds[w.id]) { mergedCustomIds[w.id] = true; mergedCustom.push(w); }
+ });
+ localStorage.setItem("word_trainer_progress_v1", JSON.stringify(mergedProgress));
+ localStorage.setItem("word_trainer_custom_words_v1", JSON.stringify(mergedCustom));
+ await setDoc(userRef, { progress: mergedProgress, customWords: mergedCustom }, { merge: true });
+ cloudData.progress = mergedProgress;
+ cloudData.customWords = mergedCustom;
+ }
+ window.currentUser = { uid: user.uid, ...cloudData };
+ }
+ if (window.onAuthReady) window.onAuthReady(window.currentUser);
+});
+
 </script>
 
 <style>
@@ -238,9 +289,11 @@ function getWordState(id) {
 
 var INTERVAL_DAYS = [0, 1, 3, 7, 14, 30, 90];
 
+
 function reviewWord(id, wasCorrect) {
-  logAnswer(wasCorrect);
-  updateLastActivity();
+ logAnswer(wasCorrect);
+ updateLastActivity();
+
   var state = getWordState(id);
   state.seen += 1;
   if (wasCorrect) {
@@ -251,9 +304,12 @@ function reviewWord(id, wasCorrect) {
   }
   var now = Date.now();
   state.nextReview = now + INTERVAL_DAYS[state.level] * 24 * 60 * 60 * 1000;
-  progress[id] = state;
-  saveProgress(progress);
+
+ progress[id] = state;
+ saveProgress(progress);
+ if (window.syncProgressToCloud) { window.syncProgressToCloud(progress, loadCustomWords()); }
 }
+
 
 function dueWords() {
   var now = Date.now();
@@ -1122,8 +1178,11 @@ function renderAddWord() {
     }
     var customWords = loadCustomWords();
     var newId = 1000 + customWords.length;
-    customWords.push({ id: newId, en: en, pl: pl, cat: cat, sentence_en: sentence_en, sentence_pl: sentence_pl });
-    saveCustomWords(customWords);
+   
+ customWords.push({ id: newId, en: en, pl: pl, cat: cat, sentence_en: sentence_en, sentence_pl: sentence_pl });
+ saveCustomWords(customWords);
+ if (window.syncProgressToCloud) { window.syncProgressToCloud(progress, customWords); }
+
     document.getElementById("addFeedback").innerHTML = "<p class='feedback ok'>Dodano! Slowo pojawi sie teraz we wszystkich trybach nauki.</p>";
     document.getElementById("newEn").value = "";
     document.getElementById("newPl").value = "";
