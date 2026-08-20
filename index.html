@@ -351,6 +351,21 @@ function newCount() {
   return getAllWords().filter(function(w) { return getWordState(w.id).level === 0; }).length;
 }
 
+function enableEnterKey(inputId, buttonId) {
+ var input = document.getElementById(inputId);
+ if (!input) return;
+ input.addEventListener("keydown", function(e) {
+ if (e.key !== "Enter") return;
+ var checkBtn = document.getElementById(buttonId);
+ if (checkBtn && !checkBtn.disabled) { checkBtn.click(); return; }
+ var nextBtn = document.querySelector(".action:not(.ghost)");
+ var buttons = document.querySelectorAll("button.action");
+ for (var i = 0; i < buttons.length; i++) {
+ if (buttons[i].textContent === "Dalej") { buttons[i].click(); return; }
+ }
+ });
+}
+
 function speak(text) {
   if (!window.speechSynthesis) return;
   var utter = new SpeechSynthesisUtterance(text);
@@ -713,6 +728,10 @@ function startDailySession() {
 
 
 
+
+enableEnterKey("dailyGapInput", "dailyCheckGap");
+
+
 document.getElementById("dailyCheckGap").onclick = function() {
  var val = document.getElementById("dailyGapInput").value.trim().toLowerCase();
  var isCorrect = val.length > 0 && val === mainWord.toLowerCase();
@@ -1006,6 +1025,8 @@ function startGapFill() {
     app.appendChild(card);
 
 
+enableEnterKey("gapInput", "checkGap");
+
 document.getElementById("checkGap").onclick = function() {
  var val = document.getElementById("gapInput").value.trim().toLowerCase();
  var isCorrect = val.length > 0 && val === mainWord.toLowerCase();
@@ -1063,6 +1084,10 @@ function startTyping() {
     app.appendChild(card);
 
  
+
+enableEnterKey("typeInput", "checkType");
+
+
 document.getElementById("checkType").onclick = function() {
  var val = document.getElementById("typeInput").value.trim().toLowerCase();
  var correctVal = w.en.toLowerCase();
